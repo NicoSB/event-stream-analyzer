@@ -70,7 +70,7 @@ public class CompactEventTest {
     public void whenDateTimeIsDifferent_equalsReturnsFalse() {
         // given
         final ZonedDateTime now = ZonedDateTime.now();
-        final ZonedDateTime now2 = ZonedDateTime.now();
+        final ZonedDateTime now2 = ZonedDateTime.now().minusDays(1);
         IIDEEvent TestEvent = new TestEvent(now);
         IIDEEvent TestEvent2 = new TestEvent(now2);
 
@@ -121,7 +121,7 @@ public class CompactEventTest {
         IIDEEvent TestEvent = new TestEvent(now);
         IIDEEvent iideEvent = new IDEEvent() {
             @Override
-            public ZonedDateTime getTerminatedAt() {
+            public ZonedDateTime getTriggeredAt() {
                 return now;
             }
         };

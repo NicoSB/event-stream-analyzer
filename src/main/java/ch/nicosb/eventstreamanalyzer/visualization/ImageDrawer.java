@@ -13,20 +13,13 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package ch.nicosb.eventstreamanalyzer.stream;
+package ch.nicosb.eventstreamanalyzer.visualization;
 
-import cc.kave.commons.model.events.IIDEEvent;
+import ch.nicosb.eventstreamanalyzer.stream.CompactEvent;
 
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class EventListTransformer {
-    public static List<CompactEvent> fromEventList(List<IIDEEvent> events) {
-        return events
-                .stream()
-                .sorted(Comparator.comparing(IIDEEvent::getTriggeredAt))
-                .map(CompactEvent::new)
-                .collect(Collectors.toList());
-    }
+public interface ImageDrawer {
+    void drawImage();
+    void setEvents(List<CompactEvent> events);
 }

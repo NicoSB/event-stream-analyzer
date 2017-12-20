@@ -13,20 +13,22 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package ch.nicosb.eventstreamanalyzer.stream;
+package ch.nicosb.eventstreamanalyzer.data.aggregators;
 
 import cc.kave.commons.model.events.IIDEEvent;
 
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class EventListTransformer {
-    public static List<CompactEvent> fromEventList(List<IIDEEvent> events) {
-        return events
-                .stream()
-                .sorted(Comparator.comparing(IIDEEvent::getTriggeredAt))
-                .map(CompactEvent::new)
-                .collect(Collectors.toList());
+public abstract class Aggregator {
+    private String title;
+
+    public Aggregator(String title) {
+        this.title = title;
     }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public abstract double aggregateValue(List<IIDEEvent> events, IIDEEvent event);
 }

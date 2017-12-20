@@ -13,27 +13,31 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package ch.nicosb.eventstreamanalyzer.testutils;
-
-
-import cc.kave.commons.model.events.IIDEEvent;
+package ch.nicosb.eventstreamanalyzer.data;
 
 import java.time.ZonedDateTime;
+import java.util.HashMap;
 
-public class TestEvent implements IIDEEvent {
+public class Entry {
+    private String eventType;
     private ZonedDateTime dateTime;
+    private HashMap<String, Double> fields;
 
-    public TestEvent(ZonedDateTime dateTime) {
+    public Entry(String eventType, ZonedDateTime dateTime) {
+        this.eventType = eventType;
         this.dateTime = dateTime;
+        this.fields = new HashMap<>();
     }
 
-    @Override
-    public ZonedDateTime getTriggeredAt() {
-        return dateTime;
+    public void put(String title, double value) {
+        fields.put(title, value);
     }
 
-    @Override
-    public ZonedDateTime getTerminatedAt() {
-        return dateTime;
+    public void remove(String title) {
+        fields.remove(title);
+    }
+
+    public HashMap<String, Double> getFields() {
+        return fields;
     }
 }

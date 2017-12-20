@@ -13,20 +13,31 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package ch.nicosb.eventstreamanalyzer.stream;
+package ch.nicosb.eventstreamanalyzer.data;
 
 import cc.kave.commons.model.events.IIDEEvent;
 
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class EventListTransformer {
-    public static List<CompactEvent> fromEventList(List<IIDEEvent> events) {
-        return events
-                .stream()
-                .sorted(Comparator.comparing(IIDEEvent::getTriggeredAt))
-                .map(CompactEvent::new)
-                .collect(Collectors.toList());
+public class TraverserImpl extends Traverser {
+    private List<Entry> entries;
+
+    public TraverserImpl(List<IIDEEvent> events) {
+        super(events);
+        entries = new ArrayList<>();
+    }
+
+    @Override
+    List<Entry> traverse() {
+        events.forEach(this::applyAggregators);
+        return entries;
+    }
+
+    private void applyAggregators(IIDEEvent event) {
+        Entry entry = new Entry(event.getClass().getName(), event.getTriggeredAt());
+        aggregators.forEach(ag -> entry.put(ag.getTitle(), ag.aggregateValue(events, event)));
+
+        entries.add(entry);
     }
 }

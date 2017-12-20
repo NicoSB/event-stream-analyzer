@@ -24,7 +24,7 @@ public class CompactEvent {
     public String eventType;
 
     public CompactEvent(IIDEEvent event) {
-        this.dateTime = event.getTerminatedAt();
+        this.dateTime = event.getTriggeredAt();
         this.eventType = event.getClass().getName();
     }
 
