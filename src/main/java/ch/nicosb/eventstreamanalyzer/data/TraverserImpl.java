@@ -35,6 +35,8 @@ public class TraverserImpl extends Traverser {
     }
 
     private void applyAggregators(IIDEEvent event) {
+        System.out.printf("Applying aggregators to event of type '%s'.\n", event.getClass().getName());
+
         Entry entry = new Entry(event.getClass().getName(), event.getTriggeredAt());
         aggregators.forEach(ag -> entry.put(ag.getTitle(), ag.aggregateValue(events, event)));
 

@@ -40,6 +40,8 @@ public class EventParser {
     }
 
     private static List<Path> getAllZips(String uri) throws IOException {
+        System.out.printf("Gathering ZIPs from %s.\n", uri);
+
         List<Path> paths = new ArrayList<>();
         List<Path> zipFiles = FileSystemUtils.getAllFilePathsWithEnding(uri, ZIP_ENDING);
 
@@ -59,6 +61,7 @@ public class EventParser {
     }
 
     public static ArrayList<IIDEEvent> extractEvents(Path file) {
+        System.out.printf("Extracting events from %s.", file.toString());
         ArrayList<IIDEEvent> events = new ArrayList<>();
 
         IReadingArchive readingArchive = new ReadingArchive(file.toFile());
@@ -66,7 +69,11 @@ public class EventParser {
         while (readingArchive.hasNext()) {
             IDEEvent event = readingArchive.getNext(IIDEEvent.class);
             events.add(event);
+
+            System.out.printf("Parsed event of type %s.\n", event.getClass().getName());
         }
+
+        System.out.printf("Extracted %d events.\n", events.size());
 
         return events;
     }

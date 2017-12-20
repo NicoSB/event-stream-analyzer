@@ -19,6 +19,7 @@ import cc.kave.commons.model.events.IIDEEvent;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class IntervalEventWindow {
@@ -35,15 +36,16 @@ public class IntervalEventWindow {
         removeOldEvents();
     }
 
-    private void removeOldEvents() {
+    private synchronized void removeOldEvents() {
         IIDEEvent last = events.get(events.size() - 1);
         ZonedDateTime minTime = last.getTriggeredAt().minusSeconds(intervalInSeconds);
 
-        for (IIDEEvent event : events) {
+        for (Iterator<IIDEEvent> iterator = events.iterator(); iterator.hasNext();) {
+            IIDEEvent event = iterator.next();
             if (event.getTriggeredAt().compareTo(minTime) > 0)
                 break;
 
-            events.remove(event);
+            iterator.remove();
         }
     }
 

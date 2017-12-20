@@ -40,4 +40,13 @@ public class Entry {
     public HashMap<String, Double> getFields() {
         return fields;
     }
+
+    @Override
+    public String toString() {
+        return "Entry{" +
+                "eventType='" + eventType + '\'' +
+                ", dateTime=" + dateTime.toString() +
+                ", fields=" + fields.toString() +
+                '}';
+    }
 }
