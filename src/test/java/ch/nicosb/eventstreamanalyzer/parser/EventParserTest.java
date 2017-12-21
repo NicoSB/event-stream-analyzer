@@ -33,7 +33,6 @@ public class EventParserTest {
     private Path testResources;
     private final String RESOURCES_URI = "src/test/resources";
     private final String FOLDER1_URI = "folder1";
-    private final String FOLDER2_URI = "folder2";
     private final String FILE1_URI = "test1.zip";
     private final String FILE2_URI = "test2.zip";
     private final String FILE3_URI = "test3.zip";
@@ -66,19 +65,27 @@ public class EventParserTest {
         paths.add(file1);
         paths.add(file2);
 
+        String expected1 = FILE1_URI.replace(".zip", "");
+        String expected2 = FILE2_URI.replace(".zip", "");
+
         ArrayList<EventStream> streams = EventParser.parseZips(paths);
 
         // then
         assertEquals(2, streams.size());
         assertEquals(4, streams.get(0).size());
-        assertEquals(FILE1_URI, streams.get(0).getTitle());
+        assertEquals(expected1, streams.get(0).getTitle());
         assertEquals(2, streams.get(1).size());
-        assertEquals(FILE2_URI, streams.get(1).getTitle());
+        assertEquals(expected2, streams.get(1).getTitle());
 
     }
 
     @Test
     public void whenMultipleFoldersArePassed_parsesAllZips() {
+        // given
+        String expected1 = FILE1_URI.replace(".zip", "");
+        String expected2 = FILE2_URI.replace(".zip", "");
+        String expected3 = FILE3_URI.replace(".zip", "");
+
         // when
         ArrayList<EventStream> streams = EventParser.parseDirectory(RESOURCES_URI);
 
@@ -86,11 +93,11 @@ public class EventParserTest {
 
         assertEquals(3, streams.size());
         assertEquals(4, streams.get(0).size());
-        assertEquals(FILE1_URI, streams.get(0).getTitle());
+        assertEquals(expected1, streams.get(0).getTitle());
         assertEquals(2, streams.get(1).size());
-        assertEquals(FILE2_URI, streams.get(1).getTitle());
+        assertEquals(expected2, streams.get(1).getTitle());
         assertEquals(2, streams.get(2).size());
-        assertEquals(FILE3_URI, streams.get(2).getTitle());
+        assertEquals(expected3, streams.get(2).getTitle());
     }
 
     @Test(expected = IllegalArgumentException.class)

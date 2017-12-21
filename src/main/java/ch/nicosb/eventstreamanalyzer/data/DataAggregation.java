@@ -19,6 +19,7 @@ import cc.kave.commons.model.events.IIDEEvent;
 import ch.nicosb.eventstreamanalyzer.Execution;
 import ch.nicosb.eventstreamanalyzer.data.aggregators.Aggregator;
 import ch.nicosb.eventstreamanalyzer.data.aggregators.EventCountAggregator;
+import ch.nicosb.eventstreamanalyzer.data.aggregators.LastBuildAggregator;
 import ch.nicosb.eventstreamanalyzer.parser.EventParser;
 import ch.nicosb.eventstreamanalyzer.parser.EventStream;
 import ch.nicosb.eventstreamanalyzer.weka.MapToArffConverter;
@@ -57,6 +58,9 @@ public class DataAggregation implements Execution {
         int fiveMinutes = 5*60;
         Aggregator eventCountAggregator = new EventCountAggregator("EventCount", fiveMinutes);
         traverser.register(eventCountAggregator);
+
+        Aggregator timeSinceLastBuildAggregator = new LastBuildAggregator();
+        traverser.register(timeSinceLastBuildAggregator);
     }
 
     private void initConverter(List<Entry> entries) {
