@@ -20,10 +20,13 @@ import ch.nicosb.eventstreamanalyzer.Execution;
 import ch.nicosb.eventstreamanalyzer.data.aggregators.Aggregator;
 import ch.nicosb.eventstreamanalyzer.data.aggregators.EventCountAggregator;
 import ch.nicosb.eventstreamanalyzer.parser.EventParser;
+import ch.nicosb.eventstreamanalyzer.weka.MapToArffConverter;
 
 import java.util.List;
 
 public class DataAggregation implements Execution {
+
+    private static MapToArffConverter converter;
 
     @Override
     public void execute(String[] args) {
@@ -38,12 +41,18 @@ public class DataAggregation implements Execution {
 
         registerAggregators(traverser);
         List<Entry> entries = traverser.traverse();
-        //entries.forEach(e -> System.out.println(e.toString()));
+        initConverter(entries);
+        converter.writeFile();
     }
 
     private static void registerAggregators(Traverser traverser) {
         int fiveMinutes = 5*60;
         Aggregator eventCountAggregator = new EventCountAggregator("EventCount", fiveMinutes);
         traverser.register(eventCountAggregator);
+    }
+
+    private static void initConverter(List<Entry> entries) {
+        converter = new MapToArffConverter("events", "test.arff");
+        entries.forEach(entry -> converter.add(entry.getFields()));
     }
 }
