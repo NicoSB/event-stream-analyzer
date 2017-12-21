@@ -20,8 +20,10 @@ import ch.nicosb.eventstreamanalyzer.Execution;
 import ch.nicosb.eventstreamanalyzer.data.aggregators.Aggregator;
 import ch.nicosb.eventstreamanalyzer.data.aggregators.EventCountAggregator;
 import ch.nicosb.eventstreamanalyzer.parser.EventParser;
+import ch.nicosb.eventstreamanalyzer.parser.EventStream;
 import ch.nicosb.eventstreamanalyzer.weka.MapToArffConverter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class DataAggregation implements Execution {
@@ -33,25 +35,31 @@ public class DataAggregation implements Execution {
         aggregateInput(args);
     }
 
-    private static void aggregateInput(String[] args) {
+    private void aggregateInput(String[] args) {
         String folder = args[1];
-        List<IIDEEvent> events = EventParser.parseDirectory(folder);
+        List<EventStream> streams = EventParser.parseDirectory(folder);
 
-        Traverser traverser = new TraverserImpl(events);
+        List<Entry> entries = new ArrayList<>();
 
-        registerAggregators(traverser);
-        List<Entry> entries = traverser.traverse();
+        streams.forEach(stream -> entries.addAll(aggregateStream(stream)));
         initConverter(entries);
         converter.writeFile();
     }
 
-    private static void registerAggregators(Traverser traverser) {
+    private List<Entry> aggregateStream(EventStream stream) {
+        Traverser traverser = new TraverserImpl(stream.getEvents());
+
+        registerAggregators(traverser);
+        return traverser.traverse();
+    }
+
+    private void registerAggregators(Traverser traverser) {
         int fiveMinutes = 5*60;
         Aggregator eventCountAggregator = new EventCountAggregator("EventCount", fiveMinutes);
         traverser.register(eventCountAggregator);
     }
 
-    private static void initConverter(List<Entry> entries) {
+    private void initConverter(List<Entry> entries) {
         converter = new MapToArffConverter("events", "test.arff");
         entries.forEach(entry -> converter.add(entry.getFields()));
     }

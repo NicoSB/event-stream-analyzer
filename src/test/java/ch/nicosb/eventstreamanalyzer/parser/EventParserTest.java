@@ -66,40 +66,38 @@ public class EventParserTest {
         paths.add(file1);
         paths.add(file2);
 
-        ArrayList<IIDEEvent> events = EventParser.parseZips(paths);
+        ArrayList<EventStream> streams = EventParser.parseZips(paths);
 
         // then
-        assertEquals(6, events.size());
-        assertTrue(events.get(0) instanceof IDEStateEvent);
-        assertTrue(events.get(1) instanceof WindowEvent);
-        assertTrue(events.get(2) instanceof WindowEvent);
-        assertTrue(events.get(3) instanceof WindowEvent);
-        assertTrue(events.get(4) instanceof IDEStateEvent);
-        assertTrue(events.get(5) instanceof WindowEvent);
+        assertEquals(2, streams.size());
+        assertEquals(4, streams.get(0).size());
+        assertEquals(FILE1_URI, streams.get(0).getTitle());
+        assertEquals(2, streams.get(1).size());
+        assertEquals(FILE2_URI, streams.get(1).getTitle());
+
     }
 
     @Test
     public void whenMultipleFoldersArePassed_parsesAllZips() {
         // when
-        ArrayList<IIDEEvent> events = EventParser.parseDirectory(RESOURCES_URI);
+        ArrayList<EventStream> streams = EventParser.parseDirectory(RESOURCES_URI);
 
         // then
-        assertEquals(8, events.size());
-        assertTrue(events.get(0) instanceof IDEStateEvent);
-        assertTrue(events.get(1) instanceof WindowEvent);
-        assertTrue(events.get(2) instanceof WindowEvent);
-        assertTrue(events.get(3) instanceof WindowEvent);
-        assertTrue(events.get(4) instanceof IDEStateEvent);
-        assertTrue(events.get(5) instanceof WindowEvent);
-        assertTrue(events.get(6) instanceof IDEStateEvent);
-        assertTrue(events.get(7) instanceof WindowEvent);
+
+        assertEquals(3, streams.size());
+        assertEquals(4, streams.get(0).size());
+        assertEquals(FILE1_URI, streams.get(0).getTitle());
+        assertEquals(2, streams.get(1).size());
+        assertEquals(FILE2_URI, streams.get(1).getTitle());
+        assertEquals(2, streams.get(2).size());
+        assertEquals(FILE3_URI, streams.get(2).getTitle());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void whenUriIsInvalid_throwsIllegalArgumentException() {
         // when
         String invalidUri = "invalid";
-        ArrayList<IIDEEvent> events = EventParser.parseDirectory(invalidUri);
+        ArrayList<EventStream> events = EventParser.parseDirectory(invalidUri);
 
         // then throws
     }

@@ -30,7 +30,7 @@ public class EventParser {
 
     public static final String ZIP_ENDING = ".zip";
 
-    public static ArrayList<IIDEEvent> parseDirectory(String directory) {
+    public static ArrayList<EventStream> parseDirectory(String directory) {
         try {
             List<Path> zips = getAllZips(directory);
             return parseZips(zips);
@@ -50,14 +50,15 @@ public class EventParser {
         return paths;
     }
 
-    public static ArrayList<IIDEEvent> parseZips(List<Path> files) {
-        ArrayList<IIDEEvent> events = new ArrayList<>();
+    public static ArrayList<EventStream> parseZips(List<Path> files) {
+        ArrayList<EventStream> streams = new ArrayList<>();
 
         for (Path file : files) {
-            events.addAll(extractEvents(file));
+            EventStream stream = new EventStream(extractEvents(file), file.getFileName().toString().replace(".zip", ""));
+            streams.add(stream);
         }
 
-        return events;
+        return streams;
     }
 
     public static ArrayList<IIDEEvent> extractEvents(Path file) {
