@@ -15,6 +15,7 @@
  */
 package ch.nicosb.eventstreamanalyzer.data;
 
+import cc.kave.commons.model.events.IDEEvent;
 import cc.kave.commons.model.events.IIDEEvent;
 
 import java.time.ZonedDateTime;
@@ -49,6 +50,9 @@ public class Entry implements IIDEEvent {
         return event.getTriggeredAt();
     }
 
+    public IIDEEvent getEvent() {
+        return event;
+    }
 
     @Override
     public String toString() {

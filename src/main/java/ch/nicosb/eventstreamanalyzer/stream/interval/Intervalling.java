@@ -15,10 +15,9 @@
  */
 package ch.nicosb.eventstreamanalyzer.stream.interval;
 
+import cc.kave.commons.model.events.visualstudio.BuildEvent;
 import ch.nicosb.eventstreamanalyzer.Execution;
-import ch.nicosb.eventstreamanalyzer.data.Entry;
-import ch.nicosb.eventstreamanalyzer.data.Traverser;
-import ch.nicosb.eventstreamanalyzer.data.TraverserImpl;
+import ch.nicosb.eventstreamanalyzer.data.*;
 import ch.nicosb.eventstreamanalyzer.data.aggregators.Aggregator;
 import ch.nicosb.eventstreamanalyzer.data.aggregators.EventCountAggregator;
 import ch.nicosb.eventstreamanalyzer.data.aggregators.LastBuildAggregator;
@@ -33,11 +32,12 @@ import java.util.*;
 public class Intervalling implements Execution {
 
     private List<IntervalPostProcessor> postProcessors;
-    private List<Aggregator> aggregators;
+    private List<EntryAggregator> entryAggregators;
     private MapToArffConverter converter;
 
     public Intervalling() {
         this.postProcessors = new ArrayList<>();
+        entryAggregators = new ArrayList<>();
     }
 
     @Override
@@ -46,7 +46,7 @@ public class Intervalling implements Execution {
         List<EventStream> streams = EventParser.parseDirectory(folder);
 
         registerPostProcessors();
-        registerAggregators();
+        registerIntervalAggregators();
 
         streams.forEach(this::processStream);
     }
@@ -54,7 +54,7 @@ public class Intervalling implements Execution {
     private List<Entry> aggregateStream(EventStream stream) {
         Traverser traverser = new TraverserImpl(stream.getEvents());
 
-        registerAggregators(traverser);
+        registerIntervalAggregators(traverser);
         return traverser.traverse();
     }
 
@@ -63,7 +63,7 @@ public class Intervalling implements Execution {
         postProcessors.add(remover);
     }
 
-    private void registerAggregators(Traverser traverser) {
+    private void registerIntervalAggregators(Traverser traverser) {
         int fiveMinutes = 5*60;
         Aggregator eventCountAggregator = new EventCountAggregator("EventCount", fiveMinutes);
         traverser.register(eventCountAggregator);
@@ -77,7 +77,9 @@ public class Intervalling implements Execution {
         entries.forEach(entry -> converter.add(entry.getFields()));
     }
 
-    private void registerAggregators() {
+    private void registerIntervalAggregators() {
+        HasEventAggregator hasBuildEventAggregator = new HasEventAggregator(BuildEvent.class);
+        entryAggregators.add(hasBuildEventAggregator);
     }
 
     private void processStream(EventStream stream) {
@@ -85,19 +87,37 @@ public class Intervalling implements Execution {
         List<Session> sessions = getSessions(entries);
 
         List<Interval> intervals = getIntervals(sessions);
+        List<Interval> relevantIntervals = getRelevantIntervals(intervals);
+
+        List<Entry> averagedEntries = averageEntries(relevantIntervals);
+
+        writeEntriesToFile(averagedEntries);
+    }
+
+    private void writeEntriesToFile(List<Entry> averagedEntries) {
+        initConverter(averagedEntries);
+        converter.writeFile();
+    }
+
+    private List<Interval> getRelevantIntervals(List<Interval> intervals) {
         List<Interval> relevantIntervals = new ArrayList<>();
 
         for(IntervalPostProcessor processor : postProcessors) {
             relevantIntervals = processor.process(intervals);
         }
+        return relevantIntervals;
+    }
 
-
+    private List<Entry> averageEntries(List<Interval> relevantIntervals) {
         List<Entry> averagedEntries = new ArrayList<>();
-        relevantIntervals.forEach(interval ->
-                averagedEntries.add(averageValues(interval.getEntries())));
 
-        initConverter(averagedEntries);
-        converter.writeFile();
+        relevantIntervals.forEach(interval -> {
+            Entry averaged = averageValues(interval.getEntries());
+            entryAggregators.forEach(agg ->
+                    averaged.put(agg.getTitle(), agg.aggregateValue(interval.getEntries())));
+            averagedEntries.add(averaged);
+        });
+        return averagedEntries;
     }
 
     private Entry averageValues(List<Entry> entries) {
