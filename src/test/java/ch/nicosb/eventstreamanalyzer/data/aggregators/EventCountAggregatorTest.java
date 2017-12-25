@@ -16,13 +16,13 @@
 package ch.nicosb.eventstreamanalyzer.data.aggregators;
 
 import cc.kave.commons.model.events.IIDEEvent;
+import ch.nicosb.eventstreamanalyzer.stream.TriggeredAtComparator;
 import ch.nicosb.eventstreamanalyzer.testutils.TestEvent;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -42,13 +42,13 @@ public class EventCountAggregatorTest {
         IIDEEvent event1 = new TestEvent(ZonedDateTime.now());
         IIDEEvent event2 = new TestEvent(ZonedDateTime.now());
 
-        List<IIDEEvent> events = new ArrayList<>();
+        ArrayList<IIDEEvent> events = new ArrayList<>();
         events.add(event1);
         events.add(event2);
 
         // when
         aggregator.aggregateValue(events, events.get(0));
-        double actual = aggregator.aggregateValue(events, events.get(1));
+        double actual = aggregator.aggregateValue(events, events.get(events.size() - 1));
 
         // then
         assertEquals(2.0d, actual, 0.00001d);
@@ -60,13 +60,13 @@ public class EventCountAggregatorTest {
         IIDEEvent event1 = new TestEvent(ZonedDateTime.now().minusDays(1));
         IIDEEvent event2 = new TestEvent(ZonedDateTime.now());
 
-        List<IIDEEvent> events = new ArrayList<>();
+        ArrayList<IIDEEvent> events = new ArrayList<>();
         events.add(event1);
         events.add(event2);
 
         // when
         aggregator.aggregateValue(events, events.get(0));
-        double actual = aggregator.aggregateValue(events, events.get(1));
+        double actual = aggregator.aggregateValue(events, events.get(events.size() - 1));
 
         // then
         assertEquals(1.0d, actual, 0.00001d);

@@ -16,18 +16,17 @@
 package ch.nicosb.eventstreamanalyzer.data.aggregators;
 
 import cc.kave.commons.model.events.IIDEEvent;
+import ch.nicosb.eventstreamanalyzer.stream.TriggeredAtComparator;
 
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class IntervalEventWindow {
-    private List<IIDEEvent> events;
+    private TreeSet<IIDEEvent> events;
     private int intervalInSeconds;
 
     public IntervalEventWindow(int intervalInSeconds) {
-        events = new ArrayList<>();
+        events = new TreeSet<>(new TriggeredAtComparator());
         this.intervalInSeconds = intervalInSeconds;
     }
 
@@ -37,7 +36,7 @@ public class IntervalEventWindow {
     }
 
     private synchronized void removeOldEvents() {
-        IIDEEvent last = events.get(events.size() - 1);
+        IIDEEvent last = events.last();
         ZonedDateTime minTime = last.getTriggeredAt().minusSeconds(intervalInSeconds);
 
         for (Iterator<IIDEEvent> iterator = events.iterator(); iterator.hasNext();) {
@@ -54,6 +53,10 @@ public class IntervalEventWindow {
     }
 
     public IIDEEvent get(int index) {
-        return events.get(index);
+        Iterator it = events.iterator();
+        for (int i = 0; i < index && it.hasNext();i++) {
+            it.next();
+        }
+        return (IIDEEvent) it.next();
     }
 }

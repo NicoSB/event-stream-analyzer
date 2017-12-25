@@ -17,6 +17,7 @@ package ch.nicosb.eventstreamanalyzer.data;
 
 import cc.kave.commons.model.events.IIDEEvent;
 import ch.nicosb.eventstreamanalyzer.data.aggregators.Aggregator;
+import ch.nicosb.eventstreamanalyzer.stream.TriggeredAtComparator;
 import ch.nicosb.eventstreamanalyzer.testutils.TestEvent;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,6 +28,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

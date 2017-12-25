@@ -20,6 +20,7 @@ import ch.nicosb.eventstreamanalyzer.data.aggregators.Aggregator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public abstract class Traverser {
     List<Aggregator> aggregators;
@@ -34,10 +35,11 @@ public abstract class Traverser {
         if (!aggregators.contains(aggregator))
             aggregators.add(aggregator);
     }
-    void unregister(Aggregator aggregator) {
+
+    public void unregister(Aggregator aggregator) {
         if (aggregators.contains(aggregator))
             aggregators.remove(aggregator);
     }
 
-    abstract List<Entry> traverse();
+    public abstract List<Entry> traverse();
 }

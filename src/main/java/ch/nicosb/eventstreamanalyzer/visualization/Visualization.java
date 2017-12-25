@@ -18,7 +18,7 @@ package ch.nicosb.eventstreamanalyzer.visualization;
 import cc.kave.commons.model.events.IIDEEvent;
 import ch.nicosb.eventstreamanalyzer.Execution;
 import ch.nicosb.eventstreamanalyzer.parser.EventParser;
-import ch.nicosb.eventstreamanalyzer.parser.EventStream;
+import ch.nicosb.eventstreamanalyzer.stream.EventStream;
 import ch.nicosb.eventstreamanalyzer.stream.CompactEvent;
 import ch.nicosb.eventstreamanalyzer.stream.EventListTransformer;
 import ch.nicosb.eventstreamanalyzer.visualization.jfreechart.JFreeChartDrawer;

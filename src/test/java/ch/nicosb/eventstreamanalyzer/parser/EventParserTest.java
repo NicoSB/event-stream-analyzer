@@ -18,12 +18,17 @@ package ch.nicosb.eventstreamanalyzer.parser;
 import cc.kave.commons.model.events.IIDEEvent;
 import cc.kave.commons.model.events.visualstudio.IDEStateEvent;
 import cc.kave.commons.model.events.visualstudio.WindowEvent;
+import ch.nicosb.eventstreamanalyzer.stream.EventStream;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.lang.reflect.Array;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -46,14 +51,17 @@ public class EventParserTest {
     public void whenZipIsNotEmpty_extractsEvents() {
         // when
         Path testZip = Paths.get(RESOURCES_URI, FOLDER1_URI, FILE1_URI);
-        ArrayList<IIDEEvent> events = EventParser.extractEvents(testZip);
+        List<IIDEEvent> events = EventParser.extractEvents(testZip);
 
         // then
+        Iterator it = events.iterator();
+
         assertEquals(4, events.size());
-        assertTrue(events.get(0) instanceof IDEStateEvent);
-        assertTrue(events.get(1) instanceof WindowEvent);
-        assertTrue(events.get(2) instanceof WindowEvent);
-        assertTrue(events.get(3) instanceof WindowEvent);
+
+        assertTrue(it.next() instanceof IDEStateEvent);
+        assertTrue(it.next() instanceof WindowEvent);
+        assertTrue(it.next() instanceof WindowEvent);
+        assertTrue(it.next() instanceof WindowEvent);
     }
 
     @Test

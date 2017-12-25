@@ -13,30 +13,10 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package ch.nicosb.eventstreamanalyzer.parser;
-
-import cc.kave.commons.model.events.IIDEEvent;
+package ch.nicosb.eventstreamanalyzer.stream.interval;
 
 import java.util.List;
 
-public class EventStream {
-    private List<IIDEEvent> events;
-    private String title;
-
-    public EventStream(List<IIDEEvent> events, String title) {
-        this.events = events;
-        this.title = title;
-    }
-
-    public List<IIDEEvent> getEvents() {
-        return events;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public int size() {
-        return events.size();
-    }
+public interface IntervalPostProcessor {
+    List<Interval> process(List<Interval> intervals);
 }

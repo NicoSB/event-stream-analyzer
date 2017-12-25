@@ -21,6 +21,7 @@ import cc.kave.commons.model.events.visualstudio.BuildEvent;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Set;
 
 public class LastBuildAggregator extends Aggregator{
     private ZonedDateTime lastBuildTime;

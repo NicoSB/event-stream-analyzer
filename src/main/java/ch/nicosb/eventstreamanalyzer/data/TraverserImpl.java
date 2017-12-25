@@ -19,6 +19,7 @@ import cc.kave.commons.model.events.IIDEEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class TraverserImpl extends Traverser {
     private List<Entry> entries;
@@ -29,7 +30,7 @@ public class TraverserImpl extends Traverser {
     }
 
     @Override
-    List<Entry> traverse() {
+    public List<Entry> traverse() {
         events.forEach(this::applyAggregators);
         return entries;
     }
@@ -37,7 +38,7 @@ public class TraverserImpl extends Traverser {
     private void applyAggregators(IIDEEvent event) {
         System.out.printf("Applying aggregators to event of type '%s'.\n", event.getClass().getName());
 
-        Entry entry = new Entry(event.getClass().getName(), event.getTriggeredAt());
+        Entry entry = new Entry(event);
         aggregators.forEach(ag -> entry.put(ag.getTitle(), ag.aggregateValue(events, event)));
 
         entries.add(entry);

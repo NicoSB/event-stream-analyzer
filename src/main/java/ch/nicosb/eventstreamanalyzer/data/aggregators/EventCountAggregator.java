@@ -18,6 +18,7 @@ package ch.nicosb.eventstreamanalyzer.data.aggregators;
 import cc.kave.commons.model.events.IIDEEvent;
 
 import java.util.List;
+import java.util.Set;
 
 public class EventCountAggregator extends Aggregator {
     private IntervalEventWindow eventWindow;

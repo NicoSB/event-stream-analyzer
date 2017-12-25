@@ -17,17 +17,19 @@ package ch.nicosb.eventstreamanalyzer.stream;
 
 import cc.kave.commons.model.events.IIDEEvent;
 
+import java.time.ZonedDateTime;
 import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
-public class EventListTransformer {
-    public static List<CompactEvent> fromEventList(List<IIDEEvent> events) {
-        return events
-                .stream()
-                .sorted(Comparator.comparing(IIDEEvent::getTriggeredAt))
-                .map(CompactEvent::new)
-                .collect(Collectors.toList());
+public class TriggeredAtComparator implements Comparator {
+
+    @Override
+    public int compare(Object o1, Object o2) {
+        if (o1.equals(o2))
+            return 0;
+
+        ZonedDateTime date1 = ((IIDEEvent)o1).getTriggeredAt();
+        ZonedDateTime date2 = ((IIDEEvent)o2).getTriggeredAt();
+
+        return date1.isBefore(date2) ? -1 : 1;
     }
 }

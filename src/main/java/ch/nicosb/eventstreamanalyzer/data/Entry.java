@@ -15,18 +15,22 @@
  */
 package ch.nicosb.eventstreamanalyzer.data;
 
+import cc.kave.commons.model.events.IIDEEvent;
+
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 
-public class Entry {
-    private String eventType;
-    private ZonedDateTime dateTime;
+public class Entry implements IIDEEvent {
+    private IIDEEvent event;
     private HashMap<String, Double> fields;
 
-    public Entry(String eventType, ZonedDateTime dateTime) {
-        this.eventType = eventType;
-        this.dateTime = dateTime;
+    public Entry() {
         this.fields = new HashMap<>();
+    }
+
+    public Entry(IIDEEvent event) {
+        this();
+        this.event = event;
     }
 
     public void put(String title, double value) {
@@ -41,12 +45,27 @@ public class Entry {
         return fields;
     }
 
+    public ZonedDateTime getDateTime() {
+        return event.getTriggeredAt();
+    }
+
+
     @Override
     public String toString() {
         return "Entry{" +
-                "eventType='" + eventType + '\'' +
-                ", dateTime=" + dateTime.toString() +
+                "eventType='" + event.getClass().getName() + '\'' +
+                ", dateTime=" + event.getTriggeredAt() +
                 ", fields=" + fields.toString() +
                 '}';
+    }
+
+    @Override
+    public ZonedDateTime getTriggeredAt() {
+        return event.getTriggeredAt();
+    }
+
+    @Override
+    public ZonedDateTime getTerminatedAt() {
+        return event.getTerminatedAt();
     }
 }

@@ -17,17 +17,27 @@ package ch.nicosb.eventstreamanalyzer.stream;
 
 import cc.kave.commons.model.events.IIDEEvent;
 
-import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.TreeSet;
 
-public class EventListTransformer {
-    public static List<CompactEvent> fromEventList(List<IIDEEvent> events) {
-        return events
-                .stream()
-                .sorted(Comparator.comparing(IIDEEvent::getTriggeredAt))
-                .map(CompactEvent::new)
-                .collect(Collectors.toList());
+public class EventStream {
+    private List<IIDEEvent> events;
+    private String title;
+
+    public EventStream(List<IIDEEvent> events, String title) {
+        this.events = events;
+        this.title = title;
+    }
+
+    public List<IIDEEvent> getEvents() {
+        return events;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public int size() {
+        return events.size();
     }
 }

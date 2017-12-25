@@ -15,13 +15,12 @@
  */
 package ch.nicosb.eventstreamanalyzer.data;
 
-import cc.kave.commons.model.events.IIDEEvent;
 import ch.nicosb.eventstreamanalyzer.Execution;
 import ch.nicosb.eventstreamanalyzer.data.aggregators.Aggregator;
 import ch.nicosb.eventstreamanalyzer.data.aggregators.EventCountAggregator;
 import ch.nicosb.eventstreamanalyzer.data.aggregators.LastBuildAggregator;
 import ch.nicosb.eventstreamanalyzer.parser.EventParser;
-import ch.nicosb.eventstreamanalyzer.parser.EventStream;
+import ch.nicosb.eventstreamanalyzer.stream.EventStream;
 import ch.nicosb.eventstreamanalyzer.weka.MapToArffConverter;
 
 import java.util.ArrayList;
