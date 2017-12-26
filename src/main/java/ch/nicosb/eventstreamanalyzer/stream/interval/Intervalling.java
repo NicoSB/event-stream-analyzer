@@ -21,6 +21,7 @@ import ch.nicosb.eventstreamanalyzer.data.*;
 import ch.nicosb.eventstreamanalyzer.data.aggregators.Aggregator;
 import ch.nicosb.eventstreamanalyzer.data.aggregators.EventCountAggregator;
 import ch.nicosb.eventstreamanalyzer.data.aggregators.LastBuildAggregator;
+import ch.nicosb.eventstreamanalyzer.data.aggregators.LastCommitAggregator;
 import ch.nicosb.eventstreamanalyzer.data.aggregators.entryaggregators.*;
 import ch.nicosb.eventstreamanalyzer.parser.EventParser;
 import ch.nicosb.eventstreamanalyzer.stream.EventStream;
@@ -71,6 +72,9 @@ public class Intervalling implements Execution {
 
         Aggregator timeSinceLastBuildAggregator = new LastBuildAggregator();
         traverser.register(timeSinceLastBuildAggregator);
+
+        Aggregator timeSinceLastCommitAggregator = new LastCommitAggregator();
+        traverser.register(timeSinceLastCommitAggregator);
     }
 
     private void initConverter(List<Entry> entries) {

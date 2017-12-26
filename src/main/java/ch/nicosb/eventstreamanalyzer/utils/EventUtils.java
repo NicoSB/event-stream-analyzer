@@ -13,29 +13,30 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package ch.nicosb.eventstreamanalyzer.data.aggregators.entryaggregators;
+package ch.nicosb.eventstreamanalyzer.utils;
 
+import cc.kave.commons.model.events.IIDEEvent;
 import cc.kave.commons.model.events.versioncontrolevents.VersionControlAction;
 import cc.kave.commons.model.events.versioncontrolevents.VersionControlActionType;
 import cc.kave.commons.model.events.versioncontrolevents.VersionControlEvent;
-import ch.nicosb.eventstreamanalyzer.data.Entry;
-import ch.nicosb.eventstreamanalyzer.utils.EventUtils;
 
 import java.util.List;
-import java.util.Optional;
 
-public class HasCommitEventAggregator extends EntryAggregator {
+public class EventUtils {
 
-    public HasCommitEventAggregator() {
-        super("HasCommitEvent");
-    }
+    public static boolean isCommitEvent(IIDEEvent event) {
+        if(!(event instanceof VersionControlEvent))
+            return false;
 
-    @Override
-    public double aggregateValue(List<Entry> events) {
-        Optional<Entry> commitEvent = events.stream()
-                .filter(evt -> EventUtils.isCommitEvent(evt.getEvent()))
-                .findFirst();
+        VersionControlEvent vcEvent = (VersionControlEvent) event;
+        List<VersionControlAction> actions = vcEvent.Actions;
 
-        return commitEvent.isPresent() ? 1.0 : 0.0;
+        for (VersionControlAction action : actions) {
+            if (action.ActionType == VersionControlActionType.Commit) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
