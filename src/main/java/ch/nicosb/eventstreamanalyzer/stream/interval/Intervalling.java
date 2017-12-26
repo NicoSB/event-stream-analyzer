@@ -21,6 +21,9 @@ import ch.nicosb.eventstreamanalyzer.data.*;
 import ch.nicosb.eventstreamanalyzer.data.aggregators.Aggregator;
 import ch.nicosb.eventstreamanalyzer.data.aggregators.EventCountAggregator;
 import ch.nicosb.eventstreamanalyzer.data.aggregators.LastBuildAggregator;
+import ch.nicosb.eventstreamanalyzer.data.aggregators.entryaggregators.EntryAggregator;
+import ch.nicosb.eventstreamanalyzer.data.aggregators.entryaggregators.HasEventAggregator;
+import ch.nicosb.eventstreamanalyzer.data.aggregators.entryaggregators.TotalTestCompletionRatioAggregator;
 import ch.nicosb.eventstreamanalyzer.parser.EventParser;
 import ch.nicosb.eventstreamanalyzer.stream.EventStream;
 import ch.nicosb.eventstreamanalyzer.stream.Session;
@@ -80,6 +83,9 @@ public class Intervalling implements Execution {
     private void registerIntervalAggregators() {
         HasEventAggregator hasBuildEventAggregator = new HasEventAggregator(BuildEvent.class);
         entryAggregators.add(hasBuildEventAggregator);
+
+        TotalTestCompletionRatioAggregator totalTestAggregator = new TotalTestCompletionRatioAggregator();
+        entryAggregators.add(totalTestAggregator);
     }
 
     private void processStream(EventStream stream) {

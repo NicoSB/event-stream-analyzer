@@ -18,7 +18,7 @@ package ch.nicosb.eventstreamanalyzer.data.aggregators;
 import cc.kave.commons.model.events.IIDEEvent;
 import cc.kave.commons.model.events.visualstudio.BuildEvent;
 import ch.nicosb.eventstreamanalyzer.data.Entry;
-import ch.nicosb.eventstreamanalyzer.data.HasEventAggregator;
+import ch.nicosb.eventstreamanalyzer.data.aggregators.entryaggregators.HasEventAggregator;
 import ch.nicosb.eventstreamanalyzer.testutils.TestEvent;
 import org.junit.Before;
 import org.junit.Test;

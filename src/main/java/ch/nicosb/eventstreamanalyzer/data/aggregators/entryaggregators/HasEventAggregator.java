@@ -13,7 +13,9 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package ch.nicosb.eventstreamanalyzer.data;
+package ch.nicosb.eventstreamanalyzer.data.aggregators.entryaggregators;
+
+import ch.nicosb.eventstreamanalyzer.data.Entry;
 
 import java.util.List;
 import java.util.Optional;
