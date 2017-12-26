@@ -21,9 +21,7 @@ import ch.nicosb.eventstreamanalyzer.data.*;
 import ch.nicosb.eventstreamanalyzer.data.aggregators.Aggregator;
 import ch.nicosb.eventstreamanalyzer.data.aggregators.EventCountAggregator;
 import ch.nicosb.eventstreamanalyzer.data.aggregators.LastBuildAggregator;
-import ch.nicosb.eventstreamanalyzer.data.aggregators.entryaggregators.EntryAggregator;
-import ch.nicosb.eventstreamanalyzer.data.aggregators.entryaggregators.HasEventAggregator;
-import ch.nicosb.eventstreamanalyzer.data.aggregators.entryaggregators.TotalTestCompletionRatioAggregator;
+import ch.nicosb.eventstreamanalyzer.data.aggregators.entryaggregators.*;
 import ch.nicosb.eventstreamanalyzer.parser.EventParser;
 import ch.nicosb.eventstreamanalyzer.stream.EventStream;
 import ch.nicosb.eventstreamanalyzer.stream.Session;
@@ -49,7 +47,7 @@ public class Intervalling implements Execution {
         List<EventStream> streams = EventParser.parseDirectory(folder);
 
         registerPostProcessors();
-        registerIntervalAggregators();
+        registerEntryAggregators();
 
         streams.forEach(this::processStream);
     }
@@ -57,7 +55,7 @@ public class Intervalling implements Execution {
     private List<Entry> aggregateStream(EventStream stream) {
         Traverser traverser = new TraverserImpl(stream.getEvents());
 
-        registerIntervalAggregators(traverser);
+        registerAggregator(traverser);
         return traverser.traverse();
     }
 
@@ -66,7 +64,7 @@ public class Intervalling implements Execution {
         postProcessors.add(remover);
     }
 
-    private void registerIntervalAggregators(Traverser traverser) {
+    private void registerAggregator(Traverser traverser) {
         int fiveMinutes = 5*60;
         Aggregator eventCountAggregator = new EventCountAggregator("EventCount", fiveMinutes);
         traverser.register(eventCountAggregator);
@@ -80,12 +78,18 @@ public class Intervalling implements Execution {
         entries.forEach(entry -> converter.add(entry.getFields()));
     }
 
-    private void registerIntervalAggregators() {
-        HasEventAggregator hasBuildEventAggregator = new HasEventAggregator(BuildEvent.class);
+    private void registerEntryAggregators() {
+        EntryAggregator hasBuildEventAggregator = new HasEventAggregator(BuildEvent.class);
         entryAggregators.add(hasBuildEventAggregator);
 
-        TotalTestCompletionRatioAggregator totalTestAggregator = new TotalTestCompletionRatioAggregator();
+        EntryAggregator totalTestAggregator = new TotalTestCompletionRatioAggregator();
         entryAggregators.add(totalTestAggregator);
+
+        EntryAggregator runTestAggregator = new RunTestCompletionRatioAggregator();
+        entryAggregators.add(runTestAggregator);
+
+        EntryAggregator commitEventAggregator = new HasCommitEventAggregator();
+        entryAggregators.add(commitEventAggregator);
     }
 
     private void processStream(EventStream stream) {
