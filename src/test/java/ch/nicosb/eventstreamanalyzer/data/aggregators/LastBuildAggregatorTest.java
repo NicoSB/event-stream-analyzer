@@ -39,13 +39,14 @@ public class LastBuildAggregatorTest {
 
     private LastBuildAggregator aggregator;
     private ZonedDateTime now;
+    private int timeout = 10;
 
     @Mock
     private BuildEvent buildEvent;
 
     @Before
     public void setUp() throws Exception {
-        this.aggregator = new LastBuildAggregator();
+        this.aggregator = new LastBuildAggregator(10);
 
         now = ZonedDateTime.now();
         when(buildEvent.getTriggeredAt()).thenReturn(now);
@@ -83,9 +84,9 @@ public class LastBuildAggregatorTest {
     }
 
     @Test
-    public void whenBuildEventIsPresent_returnsDifference() {
+    public void whenEventsAreWithinTimeOut_doesAddDifference() {
         // given
-        ZonedDateTime later = now.plusSeconds(10);
+        ZonedDateTime later = now.plusSeconds(timeout);
 
         IIDEEvent laterEvent = new TestEvent(later);
 
@@ -93,7 +94,7 @@ public class LastBuildAggregatorTest {
         events.add(buildEvent);
         events.add(laterEvent);
 
-        double expected = 10.0d;
+        double expected = timeout;
 
         // when
         aggregator.aggregateValue(events, buildEvent);
@@ -103,4 +104,24 @@ public class LastBuildAggregatorTest {
         assertEquals(expected, actual, 0);
     }
 
+    @Test
+    public void whenEventsAreNotWithinTimeOut_doesNotAddDifference() {
+        // given
+        ZonedDateTime later = now.plusSeconds(timeout + 1);
+
+        IIDEEvent laterEvent = new TestEvent(later);
+
+        List<IIDEEvent> events = new ArrayList<>();
+        events.add(buildEvent);
+        events.add(laterEvent);
+
+        double expected = 0.0d;
+
+        // when
+        aggregator.aggregateValue(events, buildEvent);
+        double actual = aggregator.aggregateValue(events, laterEvent);
+
+        // then
+        assertEquals(expected, actual, 0);
+    }
 }

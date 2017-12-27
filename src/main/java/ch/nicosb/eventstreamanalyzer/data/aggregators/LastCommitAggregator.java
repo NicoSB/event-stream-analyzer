@@ -18,29 +18,37 @@ package ch.nicosb.eventstreamanalyzer.data.aggregators;
 import cc.kave.commons.model.events.IIDEEvent;
 import ch.nicosb.eventstreamanalyzer.utils.EventUtils;
 
-import java.time.Duration;
-import java.time.ZonedDateTime;
 import java.util.List;
 
 public class LastCommitAggregator extends Aggregator {
-    private ZonedDateTime lastCommitTime;
+    public static final String TITLE = "SecsSinceLastCommit";
+    private int timeout;
 
-    public LastCommitAggregator() {
-        super("SecsSinceLastCommit");
-        lastCommitTime = null;
+    private double activeTimeSinceLastCommit = 0;
+    private long lastEventEpochTime = -1;
+
+    public LastCommitAggregator(int timeout) {
+        super(TITLE);
+        this.timeout = timeout;
     }
 
     @Override
     public double aggregateValue(List<IIDEEvent> events, IIDEEvent event) {
-        if (EventUtils.isCommitEvent(event) || lastCommitTime == null) {
-            this.lastCommitTime = event.getTriggeredAt();
-            return 0.0d;
+        if (EventUtils.isCommitEvent(event) || lastEventEpochTime == -1) {
+            lastEventEpochTime = event.getTriggeredAt().toEpochSecond();
+            activeTimeSinceLastCommit = 0;
+            return activeTimeSinceLastCommit;
         }
 
-        return calculateSecondsSinceLastCommit(event);
-    }
+        long eventEpochTime = event.getTriggeredAt().toEpochSecond();
+        long differenceInSeconds = eventEpochTime - lastEventEpochTime;
 
-    private double calculateSecondsSinceLastCommit(IIDEEvent event) {
-        return Duration.between(lastCommitTime, event.getTriggeredAt()).getSeconds();
+        if (differenceInSeconds <= timeout) {
+            activeTimeSinceLastCommit += differenceInSeconds;
+        }
+
+        lastEventEpochTime = eventEpochTime;
+
+        return activeTimeSinceLastCommit;
     }
 }

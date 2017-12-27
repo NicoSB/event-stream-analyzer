@@ -58,7 +58,8 @@ public class DataAggregation implements Execution {
         Aggregator eventCountAggregator = new EventCountAggregator("EventCount", fiveMinutes);
         traverser.register(eventCountAggregator);
 
-        Aggregator timeSinceLastBuildAggregator = new LastBuildAggregator();
+        int twoMinutes = 2*60;
+        Aggregator timeSinceLastBuildAggregator = new LastBuildAggregator(twoMinutes);
         traverser.register(timeSinceLastBuildAggregator);
     }
 

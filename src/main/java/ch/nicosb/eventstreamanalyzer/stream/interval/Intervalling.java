@@ -70,10 +70,11 @@ public class Intervalling implements Execution {
         Aggregator eventCountAggregator = new EventCountAggregator("EventCount", fiveMinutes);
         traverser.register(eventCountAggregator);
 
-        Aggregator timeSinceLastBuildAggregator = new LastBuildAggregator();
+        int twoMinutes = 2*60;
+        Aggregator timeSinceLastBuildAggregator = new LastBuildAggregator(twoMinutes);
         traverser.register(timeSinceLastBuildAggregator);
 
-        Aggregator timeSinceLastCommitAggregator = new LastCommitAggregator();
+        Aggregator timeSinceLastCommitAggregator = new LastCommitAggregator(twoMinutes);
         traverser.register(timeSinceLastCommitAggregator);
     }
 

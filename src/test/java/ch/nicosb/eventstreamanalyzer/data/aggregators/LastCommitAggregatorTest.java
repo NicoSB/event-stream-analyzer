@@ -31,11 +31,12 @@ import static org.junit.Assert.*;
 
 public class LastCommitAggregatorTest {
 
-    LastCommitAggregator aggregator;
+    private int timeout = 10;
+    private LastCommitAggregator aggregator;
 
     @Before
     public void setUp() {
-        aggregator = new LastCommitAggregator();
+        aggregator = new LastCommitAggregator(timeout);
     }
 
     @Test
@@ -65,6 +66,7 @@ public class LastCommitAggregatorTest {
 
         VersionControlEvent commitEvent = new VersionControlEvent();
         commitEvent.Actions = actions;
+        commitEvent.TriggeredAt = ZonedDateTime.now();
 
         List<IIDEEvent> events = new ArrayList<>();
         events.add(commitEvent);
@@ -109,4 +111,51 @@ public class LastCommitAggregatorTest {
         assertEquals(difference, actual, 0);
     }
 
+
+
+    @Test
+    public void whenEventsAreWithinTimeOut_doesAddDifference() {
+        // given
+        ZonedDateTime now = ZonedDateTime.now();
+        IIDEEvent event = new TestEvent(now);
+        ZonedDateTime later = now.plusSeconds(timeout);
+
+        IIDEEvent laterEvent = new TestEvent(later);
+
+        List<IIDEEvent> events = new ArrayList<>();
+        events.add(event);
+        events.add(laterEvent);
+
+        double expected = timeout;
+
+        // when
+        aggregator.aggregateValue(events, event);
+        double actual = aggregator.aggregateValue(events, laterEvent);
+
+        // then
+        assertEquals(expected, actual, 0);
+    }
+
+    @Test
+    public void whenEventsAreNotWithinTimeOut_doesNotAddDifference() {
+        // given
+        ZonedDateTime now = ZonedDateTime.now();
+        IIDEEvent event = new TestEvent(now);
+        ZonedDateTime later = now.plusSeconds(timeout + 1);
+
+        IIDEEvent laterEvent = new TestEvent(later);
+
+        List<IIDEEvent> events = new ArrayList<>();
+        events.add(event);
+        events.add(laterEvent);
+
+        double expected = 0.0d;
+
+        // when
+        aggregator.aggregateValue(events, event);
+        double actual = aggregator.aggregateValue(events, laterEvent);
+
+        // then
+        assertEquals(expected, actual, 0);
+    }
 }
