@@ -32,13 +32,10 @@ public class LastCommitAggregator extends Aggregator {
 
     @Override
     public double aggregateValue(List<IIDEEvent> events, IIDEEvent event) {
-        if (EventUtils.isCommitEvent(event)) {
+        if (EventUtils.isCommitEvent(event) || lastCommitTime == null) {
             this.lastCommitTime = event.getTriggeredAt();
             return 0.0d;
         }
-
-        if (lastCommitTime == null)
-            return -1.0d;
 
         return calculateSecondsSinceLastCommit(event);
     }

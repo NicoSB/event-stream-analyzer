@@ -48,7 +48,7 @@ public class TotalTestCompletionRatioAggregator extends EntryAggregator {
                 .findFirst();
 
         if (!lastEvent.isPresent() || !(lastEvent.get().getEvent() instanceof TestRunEvent))
-            return -1.0d;
+            return 0.0d;
 
         TestRunEvent testEvent = (TestRunEvent) lastEvent.get().getEvent();
         return getTestCompletionRatio(testEvent.Tests);

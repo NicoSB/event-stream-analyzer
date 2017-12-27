@@ -39,17 +39,19 @@ public class LastCommitAggregatorTest {
     }
 
     @Test
-    public void whenFirstEventIsGiven_returnsMinusOne() {
+    public void whenFirstEventIsGiven_returnsZero() {
         // given
         IIDEEvent event = new TestEvent(ZonedDateTime.now());
         List<IIDEEvent> events = new ArrayList<>();
         events.add(event);
 
+        double expected = 0.0d;
+
         // when
         double actual = aggregator.aggregateValue(events, event);
 
         // then
-        assertEquals(-1.0d, actual, 0);
+        assertEquals(expected, actual, 0);
     }
 
     @Test
@@ -67,11 +69,13 @@ public class LastCommitAggregatorTest {
         List<IIDEEvent> events = new ArrayList<>();
         events.add(commitEvent);
 
+        double expected = 0.0d;
+
         // when
         double actual = aggregator.aggregateValue(events, commitEvent);
 
         // then
-        assertEquals(0.0d, actual, 0);
+        assertEquals(expected, actual, 0);
     }
 
     @Test
@@ -102,7 +106,7 @@ public class LastCommitAggregatorTest {
         double actual = aggregator.aggregateValue(events, laterEvent);
 
         // then
-        assertEquals(10.0d, actual, 0);
+        assertEquals(difference, actual, 0);
     }
 
 }

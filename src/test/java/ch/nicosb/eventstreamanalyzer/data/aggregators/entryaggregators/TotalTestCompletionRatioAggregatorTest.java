@@ -41,17 +41,19 @@ public class TotalTestCompletionRatioAggregatorTest {
     }
 
     @Test
-    public void whenHasNoTestEvents_returnsMinusOne()  {
+    public void whenHasNoTestEvents_returnsZero()  {
         // given
         IIDEEvent event = new TestEvent(ZonedDateTime.now());
         List<Entry> entries = new ArrayList<>();
         entries.add(new Entry(event));
 
+        double expected = 0.0d;
+
         // when
         double actual = aggregator.aggregateValue(entries);
 
         // then
-        assertEquals(-1.0d, actual, 0);
+        assertEquals(expected, actual, 0);
     }
 
     @Test

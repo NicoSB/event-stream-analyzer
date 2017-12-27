@@ -21,7 +21,6 @@ import cc.kave.commons.model.events.visualstudio.BuildEvent;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Set;
 
 public class LastBuildAggregator extends Aggregator{
     private ZonedDateTime lastBuildTime;
@@ -33,18 +32,15 @@ public class LastBuildAggregator extends Aggregator{
 
     @Override
     public double aggregateValue(List<IIDEEvent> events, IIDEEvent event) {
-        if (event instanceof BuildEvent) {
+        if (event instanceof BuildEvent || lastBuildTime == null) {
             this.lastBuildTime = event.getTriggeredAt();
             return 0.0d;
         }
 
-        if (lastBuildTime == null)
-            return -1.0d;
-
-        return secondsSinceLastBuild(event);
+        return calculateSecondsSinceLastBuild(event);
     }
 
-    private double secondsSinceLastBuild(IIDEEvent event) {
+    private double calculateSecondsSinceLastBuild(IIDEEvent event) {
         return Duration.between(lastBuildTime, event.getTriggeredAt()).getSeconds();
     }
 }

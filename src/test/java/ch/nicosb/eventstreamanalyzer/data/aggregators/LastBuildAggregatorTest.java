@@ -67,13 +67,13 @@ public class LastBuildAggregatorTest {
     }
 
     @Test
-    public void whenNoBuildEventPreceded_returnsMinus1() {
+    public void whenNoBuildEventPreceded_returnsZero() {
         // given
         IIDEEvent buildEvent = new TestEvent(ZonedDateTime.now());
         List<IIDEEvent> events = new ArrayList<>();
         events.add(buildEvent);
 
-        double expected = -1.0d;
+        double expected = 0.0d;
 
         // when
         double actual = aggregator.aggregateValue(events, buildEvent);
