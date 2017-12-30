@@ -19,7 +19,7 @@ import ch.nicosb.eventstreamanalyzer.Execution;
 import ch.nicosb.eventstreamanalyzer.data.aggregators.Aggregator;
 import ch.nicosb.eventstreamanalyzer.data.aggregators.EventCountAggregator;
 import ch.nicosb.eventstreamanalyzer.data.aggregators.LastBuildAggregator;
-import ch.nicosb.eventstreamanalyzer.parser.EventParser;
+import ch.nicosb.eventstreamanalyzer.parser.ZipUtils;
 import ch.nicosb.eventstreamanalyzer.stream.EventStream;
 import ch.nicosb.eventstreamanalyzer.weka.MapToArffConverter;
 
@@ -37,13 +37,13 @@ public class DataAggregation implements Execution {
 
     private void aggregateInput(String[] args) {
         String folder = args[1];
-        List<EventStream> streams = EventParser.parseDirectory(folder);
-
-        List<Entry> entries = new ArrayList<>();
-
-        streams.forEach(stream -> entries.addAll(aggregateStream(stream)));
-        initConverter(entries);
-        converter.writeFile();
+//        List<EventStream> streams = ZipUtils.parseDirectory(folder);
+//
+//        List<Entry> entries = new ArrayList<>();
+//
+//        streams.forEach(stream -> entries.addAll(aggregateStream(stream)));
+//        initConverter(entries);
+//        converter.writeFile();
     }
 
     private List<Entry> aggregateStream(EventStream stream) {

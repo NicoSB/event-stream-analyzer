@@ -46,11 +46,13 @@ public class HasCommitEventTest {
         List<Entry> entries = new ArrayList<>();
         entries.add(new Entry(event));
 
+        String expected = "0.0";
+
         // when
-        double actual = aggregator.aggregateValue(entries);
+        String actual = aggregator.aggregateValue(entries);
 
         // then
-        assertEquals(0.0, actual, 0);
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -66,11 +68,13 @@ public class HasCommitEventTest {
         List<Entry> entries = new ArrayList<>();
         entries.add(new Entry(event));
 
+        String expected = "0.0";
+
         // when
-        double actual = aggregator.aggregateValue(entries);
+        String actual = aggregator.aggregateValue(entries);
 
         // then
-        assertEquals(0.0, actual, 0);
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -86,10 +90,12 @@ public class HasCommitEventTest {
         List<Entry> entries = new ArrayList<>();
         entries.add(new Entry(event));
 
+        String expected = "1.0";
+
         // when
-        double actual = aggregator.aggregateValue(entries);
+        String actual = aggregator.aggregateValue(entries);
 
         // then
-        assertEquals(1.0, actual, 0);
+        assertEquals(expected, actual);
     }
 }

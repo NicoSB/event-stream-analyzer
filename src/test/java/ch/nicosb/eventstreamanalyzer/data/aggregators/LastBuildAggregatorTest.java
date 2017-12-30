@@ -58,13 +58,13 @@ public class LastBuildAggregatorTest {
         List<IIDEEvent> events = new ArrayList<>();
         events.add(buildEvent);
 
-        double expected = 0.0d;
+        String expected = "0.0";
 
         // when
-        double actual = aggregator.aggregateValue(events, buildEvent);
+        String actual = aggregator.aggregateValue(events, buildEvent);
 
         // then
-        assertEquals(expected, actual, 0);
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -74,13 +74,13 @@ public class LastBuildAggregatorTest {
         List<IIDEEvent> events = new ArrayList<>();
         events.add(buildEvent);
 
-        double expected = 0.0d;
+        String expected = "0.0";
 
         // when
-        double actual = aggregator.aggregateValue(events, buildEvent);
+        String actual = aggregator.aggregateValue(events, buildEvent);
 
         // then
-        assertEquals(expected, actual, 0);
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -94,14 +94,14 @@ public class LastBuildAggregatorTest {
         events.add(buildEvent);
         events.add(laterEvent);
 
-        double expected = timeout;
+        String expected = "10.0";
 
         // when
         aggregator.aggregateValue(events, buildEvent);
-        double actual = aggregator.aggregateValue(events, laterEvent);
+        String actual = aggregator.aggregateValue(events, laterEvent);
 
         // then
-        assertEquals(expected, actual, 0);
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -115,13 +115,13 @@ public class LastBuildAggregatorTest {
         events.add(buildEvent);
         events.add(laterEvent);
 
-        double expected = 0.0d;
+        String expected = "0.0";
 
         // when
         aggregator.aggregateValue(events, buildEvent);
-        double actual = aggregator.aggregateValue(events, laterEvent);
+        String actual = aggregator.aggregateValue(events, laterEvent);
 
         // then
-        assertEquals(expected, actual, 0);
+        assertEquals(expected, actual);
     }
 }

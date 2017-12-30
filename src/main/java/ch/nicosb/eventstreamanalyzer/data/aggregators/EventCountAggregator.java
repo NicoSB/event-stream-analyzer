@@ -29,8 +29,8 @@ public class EventCountAggregator extends Aggregator {
     }
 
     @Override
-    public double aggregateValue(List<IIDEEvent> events, IIDEEvent event) {
+    public String aggregateValue(List<IIDEEvent> events, IIDEEvent event) {
         eventWindow.add(event);
-        return eventWindow.size();
+        return String.valueOf(eventWindow.size());
     }
 }

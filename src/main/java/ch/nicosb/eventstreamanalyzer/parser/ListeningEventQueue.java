@@ -13,23 +13,40 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package ch.nicosb.eventstreamanalyzer.data.aggregators.entryaggregators;
+package ch.nicosb.eventstreamanalyzer.parser;
 
-import ch.nicosb.eventstreamanalyzer.data.Entry;
+import cc.kave.commons.model.events.IIDEEvent;
 
-import java.util.List;
+import java.util.ArrayDeque;
+import java.util.Queue;
 
-public abstract class EntryAggregator {
-
+public class ListeningEventQueue implements EventParsedListener {
+    private Queue<IIDEEvent> queue;
     private String title;
 
-    public EntryAggregator(String title) {
+    public ListeningEventQueue(String title) {
+        queue = new ArrayDeque<>();
         this.title = title;
+    }
+
+    public void add(IIDEEvent event) {
+        queue.add(event);
+    }
+
+    public IIDEEvent poll() {
+        return queue.poll();
+    }
+
+    @Override
+    public void onEventParsed(IIDEEvent event) {
+        add(event);
     }
 
     public String getTitle() {
         return title;
     }
 
-    public abstract String aggregateValue(List<Entry> events);
+    public int size() {
+        return queue.size();
+    }
 }

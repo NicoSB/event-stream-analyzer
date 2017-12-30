@@ -47,13 +47,13 @@ public class RunTestCompletionRatioAggregatorTest {
         List<Entry> entries = new ArrayList<>();
         entries.add(new Entry(event));
 
-        double expected = 0.0d;
+        String expected = "0.0";
 
         // when
-        double actual = aggregator.aggregateValue(entries);
+        String actual = aggregator.aggregateValue(entries);
 
         // then
-        assertEquals(expected, actual, 0);
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -74,10 +74,10 @@ public class RunTestCompletionRatioAggregatorTest {
         entries.add(new Entry(event));
 
         // when
-        double actual = aggregator.aggregateValue(entries);
+        String actual = aggregator.aggregateValue(entries);
 
         // then
-        assertEquals(0.5d, actual, 0);
+        assertEquals("0.5", actual);
     }
 
     @Test
@@ -104,10 +104,10 @@ public class RunTestCompletionRatioAggregatorTest {
         entries.add(new Entry(positiveEvent));
 
         // when
-        double actual = aggregator.aggregateValue(entries);
+        String actual = aggregator.aggregateValue(entries);
 
         // then
-        assertEquals(1.0d, actual, 0);
+        assertEquals("1.0", actual);
     }
 
     @Test
@@ -129,10 +129,10 @@ public class RunTestCompletionRatioAggregatorTest {
         entries.add(new Entry(event));
 
         // when
-        double actual = aggregator.aggregateValue(entries);
+        String actual = aggregator.aggregateValue(entries);
 
         // then
-        assertEquals(1.0d, actual, 0);
+        assertEquals("1.0", actual);
     }
 
     @Test
@@ -154,9 +154,9 @@ public class RunTestCompletionRatioAggregatorTest {
         entries.add(new Entry(event));
 
         // when
-        double actual = aggregator.aggregateValue(entries);
+        String actual = aggregator.aggregateValue(entries);
 
         // then
-        assertEquals(1.0d, actual, 0);
+        assertEquals("1.0", actual);
     }
 }

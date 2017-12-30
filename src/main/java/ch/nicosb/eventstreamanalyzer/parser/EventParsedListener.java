@@ -13,23 +13,10 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package ch.nicosb.eventstreamanalyzer.data.aggregators.entryaggregators;
+package ch.nicosb.eventstreamanalyzer.parser;
 
-import ch.nicosb.eventstreamanalyzer.data.Entry;
+import cc.kave.commons.model.events.IIDEEvent;
 
-import java.util.List;
-
-public abstract class EntryAggregator {
-
-    private String title;
-
-    public EntryAggregator(String title) {
-        this.title = title;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public abstract String aggregateValue(List<Entry> events);
+public interface EventParsedListener {
+    void onEventParsed(IIDEEvent event);
 }

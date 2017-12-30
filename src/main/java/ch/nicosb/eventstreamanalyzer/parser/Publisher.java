@@ -13,23 +13,9 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package ch.nicosb.eventstreamanalyzer.data.aggregators.entryaggregators;
+package ch.nicosb.eventstreamanalyzer.parser;
 
-import ch.nicosb.eventstreamanalyzer.data.Entry;
-
-import java.util.List;
-
-public abstract class EntryAggregator {
-
-    private String title;
-
-    public EntryAggregator(String title) {
-        this.title = title;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public abstract String aggregateValue(List<Entry> events);
+public interface Publisher {
+    void subscribe(EventParsedListener listener);
+    void unsubscribe(EventParsedListener listener);
 }

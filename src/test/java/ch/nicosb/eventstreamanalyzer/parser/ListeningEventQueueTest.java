@@ -13,61 +13,63 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package ch.nicosb.eventstreamanalyzer.data.aggregators;
+package ch.nicosb.eventstreamanalyzer.parser;
 
 import cc.kave.commons.model.events.IIDEEvent;
-import cc.kave.commons.model.events.visualstudio.BuildEvent;
-import ch.nicosb.eventstreamanalyzer.data.Entry;
-import ch.nicosb.eventstreamanalyzer.data.aggregators.entryaggregators.HasEventAggregator;
 import ch.nicosb.eventstreamanalyzer.testutils.TestEvent;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.Assert.*;
 
-public class HasEventAggregatorTest {
+public class ListeningEventQueueTest {
 
-    private HasEventAggregator aggregator;
+    private static final String TITLE = "Title";
+    private ListeningEventQueue queue;
 
     @Before
     public void setUp() {
-        aggregator = new HasEventAggregator(TestEvent.class);
+        queue = new ListeningEventQueue(TITLE);
     }
 
     @Test
-    public void whenListContainsEvent_returnsOneDotZero() {
+    public void whenEventIsAdded_eventIsAdded() {
         // given
-        List<Entry> entries = new ArrayList<>();
         IIDEEvent event = new TestEvent(ZonedDateTime.now());
-        entries.add(new Entry(event));
-
-        String expected = "1.0";
 
         // when
-        String actual = aggregator.aggregateValue(entries);
+        queue.add(event);
 
         // then
-        assertEquals(expected, actual);
+        assertEquals(event, queue.poll());
     }
 
     @Test
-    public void whenListDoesNotContainEvent_returnsZeroDotZero() {
+    public void whenEventIsPolled_eventIsRemoved() {
         // given
-        List<Entry> entries = new ArrayList<>();
-        IIDEEvent event = new BuildEvent();
-        entries.add(new Entry(event));
-
-        String expected = "0.0";
+        IIDEEvent event = new TestEvent(ZonedDateTime.now());
 
         // when
-        String actual = aggregator.aggregateValue(entries);
+        queue.add(event);
+        IIDEEvent polled = queue.poll();
 
         // then
-        assertEquals(expected, actual);
+        assertEquals(event, polled);
+        assertEquals(0, queue.size());
     }
 
+    @Test
+    public void whenEventIsParsed_eventIsAdded() {
+        // given
+        IIDEEvent event = new TestEvent(ZonedDateTime.now());
+
+        // when
+        queue.onEventParsed(event);
+
+        // then
+        assertEquals(1, queue.size());
+        assertEquals(event, queue.poll());
+    }
 }

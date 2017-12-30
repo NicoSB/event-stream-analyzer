@@ -23,7 +23,7 @@ import java.util.HashMap;
 
 public class Entry implements IIDEEvent {
     private IIDEEvent event;
-    private HashMap<String, Double> fields;
+    private HashMap<String, String> fields;
 
     public Entry() {
         this.fields = new HashMap<>();
@@ -34,7 +34,7 @@ public class Entry implements IIDEEvent {
         this.event = event;
     }
 
-    public void put(String title, double value) {
+    public void put(String title, String value) {
         fields.put(title, value);
     }
 
@@ -42,7 +42,7 @@ public class Entry implements IIDEEvent {
         fields.remove(title);
     }
 
-    public HashMap<String, Double> getFields() {
+    public HashMap<String, String> getFields() {
         return fields;
     }
 

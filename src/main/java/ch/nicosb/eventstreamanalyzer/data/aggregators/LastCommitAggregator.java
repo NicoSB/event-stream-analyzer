@@ -21,7 +21,7 @@ import ch.nicosb.eventstreamanalyzer.utils.EventUtils;
 import java.util.List;
 
 public class LastCommitAggregator extends Aggregator {
-    public static final String TITLE = "SecsSinceLastCommit";
+    private static final String TITLE = "SecsSinceLastCommit";
     private int timeout;
 
     private double activeTimeSinceLastCommit = 0;
@@ -33,11 +33,11 @@ public class LastCommitAggregator extends Aggregator {
     }
 
     @Override
-    public double aggregateValue(List<IIDEEvent> events, IIDEEvent event) {
+    public String aggregateValue(List<IIDEEvent> events, IIDEEvent event) {
         if (EventUtils.isCommitEvent(event) || lastEventEpochTime == -1) {
             lastEventEpochTime = event.getTriggeredAt().toEpochSecond();
             activeTimeSinceLastCommit = 0;
-            return activeTimeSinceLastCommit;
+            return String.valueOf(activeTimeSinceLastCommit);
         }
 
         long eventEpochTime = event.getTriggeredAt().toEpochSecond();
@@ -49,6 +49,6 @@ public class LastCommitAggregator extends Aggregator {
 
         lastEventEpochTime = eventEpochTime;
 
-        return activeTimeSinceLastCommit;
+        return String.valueOf(activeTimeSinceLastCommit);
     }
 }

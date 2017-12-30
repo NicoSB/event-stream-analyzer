@@ -31,11 +31,11 @@ public class HasCommitEventAggregator extends EntryAggregator {
     }
 
     @Override
-    public double aggregateValue(List<Entry> events) {
+    public String aggregateValue(List<Entry> events) {
         Optional<Entry> commitEvent = events.stream()
                 .filter(evt -> EventUtils.isCommitEvent(evt.getEvent()))
                 .findFirst();
 
-        return commitEvent.isPresent() ? 1.0 : 0.0;
+        return commitEvent.isPresent() ? "1.0" : "0.0";
     }
 }

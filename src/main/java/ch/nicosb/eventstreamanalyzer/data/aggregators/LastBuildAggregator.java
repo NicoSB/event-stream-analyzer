@@ -33,11 +33,11 @@ public class LastBuildAggregator extends Aggregator{
     }
 
     @Override
-    public double aggregateValue(List<IIDEEvent> events, IIDEEvent event) {
+    public String aggregateValue(List<IIDEEvent> events, IIDEEvent event) {
         if (event instanceof BuildEvent || lastEventEpochTime == -1) {
             lastEventEpochTime = event.getTriggeredAt().toEpochSecond();
             activeTimeSinceLastBuild = 0;
-            return activeTimeSinceLastBuild;
+            return String.valueOf(activeTimeSinceLastBuild);
         }
 
         long eventEpochTime = event.getTriggeredAt().toEpochSecond();
@@ -49,6 +49,6 @@ public class LastBuildAggregator extends Aggregator{
 
         lastEventEpochTime = eventEpochTime;
 
-        return activeTimeSinceLastBuild;
+        return String.valueOf(activeTimeSinceLastBuild);
     }
 }

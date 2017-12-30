@@ -23,12 +23,16 @@ import ch.nicosb.eventstreamanalyzer.data.aggregators.EventCountAggregator;
 import ch.nicosb.eventstreamanalyzer.data.aggregators.LastBuildAggregator;
 import ch.nicosb.eventstreamanalyzer.data.aggregators.LastCommitAggregator;
 import ch.nicosb.eventstreamanalyzer.data.aggregators.entryaggregators.*;
-import ch.nicosb.eventstreamanalyzer.parser.EventParser;
+import ch.nicosb.eventstreamanalyzer.parser.ListeningEventQueue;
+import ch.nicosb.eventstreamanalyzer.parser.NotifyingZipParser;
+import ch.nicosb.eventstreamanalyzer.parser.ZipUtils;
 import ch.nicosb.eventstreamanalyzer.stream.EventStream;
 import ch.nicosb.eventstreamanalyzer.stream.Session;
 import ch.nicosb.eventstreamanalyzer.stream.Sessionizer;
 import ch.nicosb.eventstreamanalyzer.weka.MapToArffConverter;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.*;
 
 public class Intervalling implements Execution {
@@ -44,13 +48,42 @@ public class Intervalling implements Execution {
 
     @Override
     public void execute(String[] args) {
-        String folder = args[1];
-        List<EventStream> streams = EventParser.parseDirectory(folder);
+        try {
+            long millis = System.currentTimeMillis();
+            String folder = args[1];
+            List<Path> zips = ZipUtils.getAllZips(folder);
 
-        registerPostProcessors();
-        registerEntryAggregators();
+            zips.parallelStream().forEach(this::processZip);
+            System.out.println(System.currentTimeMillis() - millis);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-        streams.forEach(this::processStream);
+    private void processZip(Path path) {
+        NotifyingZipParser parser = new NotifyingZipParser(path);
+        ListeningEventQueue queue = new ListeningEventQueue(path.getFileName().toString());
+        QueueProcessor processor = new QueueProcessor(queue);
+
+        registerAggregators(processor);
+        parser.subscribe(queue);
+
+        processor.start();
+        parser.parse();
+        processor.stop();
+    }
+
+    private void registerAggregators(QueueProcessor processor) {
+        int fiveMinutes = 5*60;
+        Aggregator eventCountAggregator = new EventCountAggregator("EventCount", fiveMinutes);
+        processor.registerAggregator(eventCountAggregator);
+
+        int twoMinutes = 2*60;
+        Aggregator timeSinceLastBuildAggregator = new LastBuildAggregator(twoMinutes);
+        processor.registerAggregator(timeSinceLastBuildAggregator);
+
+        Aggregator timeSinceLastCommitAggregator = new LastCommitAggregator(twoMinutes);
+        processor.registerAggregator(timeSinceLastCommitAggregator);
     }
 
     private List<Entry> aggregateStream(EventStream stream) {
@@ -132,6 +165,7 @@ public class Intervalling implements Execution {
                     averaged.put(agg.getTitle(), agg.aggregateValue(interval.getEntries())));
             averagedEntries.add(averaged);
         });
+
         return averagedEntries;
     }
 
@@ -144,14 +178,14 @@ public class Intervalling implements Execution {
         return entry;
     }
 
-    private double averageValue(List<Entry> entries, String key) {
+    private String averageValue(List<Entry> entries, String key) {
         double sum = 0d;
 
         for (Entry entry : entries) {
-            sum += entry.getFields().get(key);
+            sum += Double.valueOf(entry.getFields().get(key));
         }
 
-        return sum / entries.size();
+        return String.valueOf(sum / entries.size());
     }
 
     private List<Session> getSessions(List<Entry> events) {

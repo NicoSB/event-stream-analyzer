@@ -13,23 +13,17 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package ch.nicosb.eventstreamanalyzer.data.aggregators.entryaggregators;
+package ch.nicosb.eventstreamanalyzer.data.aggregators;
 
-import ch.nicosb.eventstreamanalyzer.data.Entry;
+public abstract class NominalAggregator extends Aggregator {
+    private String[] possibleValues;
 
-import java.util.List;
-
-public abstract class EntryAggregator {
-
-    private String title;
-
-    public EntryAggregator(String title) {
-        this.title = title;
+    public NominalAggregator(String title, String... possibleValues) {
+        super(title);
+        this.possibleValues = possibleValues;
     }
 
-    public String getTitle() {
-        return title;
+    public String[] getPossibleValues() {
+        return possibleValues;
     }
-
-    public abstract String aggregateValue(List<Entry> events);
 }

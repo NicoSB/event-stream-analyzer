@@ -41,7 +41,7 @@ import static org.mockito.Mockito.when;
 public class TraverserImplTest {
 
     public static final String AGGREGATOR_TITLE = "AGG";
-    public static final double VALUE = 19.34;
+    public static final String VALUE = "19.34";
     private TraverserImpl traverser;
     private List<IIDEEvent> events;
     private boolean visited;
@@ -91,9 +91,9 @@ public class TraverserImplTest {
     private Aggregator createVisitedAggregator() {
         return new Aggregator("VisitedAggregator") {
             @Override
-            public double aggregateValue(List<IIDEEvent> events, IIDEEvent event) {
+            public String aggregateValue(List<IIDEEvent> events, IIDEEvent event) {
                 visited = true;
-                return 1.0d;
+                return "1.0";
             }
         };
     }
@@ -109,10 +109,10 @@ public class TraverserImplTest {
         assertEquals(1, entries.get(1).getFields().size());
         assertEquals(1, entries.get(2).getFields().size());
         assertEquals(1, entries.get(3).getFields().size());
-        assertEquals(VALUE, (double)entries.get(0).getFields().get(AGGREGATOR_TITLE), 0);
-        assertEquals(VALUE, (double)entries.get(1).getFields().get(AGGREGATOR_TITLE), 0);
-        assertEquals(VALUE, (double)entries.get(2).getFields().get(AGGREGATOR_TITLE), 0);
-        assertEquals(VALUE, (double)entries.get(3).getFields().get(AGGREGATOR_TITLE), 0);
+        assertEquals(VALUE, entries.get(0).getFields().get(AGGREGATOR_TITLE));
+        assertEquals(VALUE, entries.get(1).getFields().get(AGGREGATOR_TITLE));
+        assertEquals(VALUE, entries.get(2).getFields().get(AGGREGATOR_TITLE));
+        assertEquals(VALUE, entries.get(3).getFields().get(AGGREGATOR_TITLE));
 
     }
 

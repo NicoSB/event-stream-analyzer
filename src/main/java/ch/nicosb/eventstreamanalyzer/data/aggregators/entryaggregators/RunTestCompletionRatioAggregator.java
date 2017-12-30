@@ -33,12 +33,12 @@ public class RunTestCompletionRatioAggregator extends EntryAggregator {
     }
 
     @Override
-    public double aggregateValue(List<Entry> events) {
+    public String aggregateValue(List<Entry> events) {
         List<Entry> testEvents = events.stream()
                 .filter(evt -> evt.getEvent() instanceof TestRunEvent)
                 .collect(Collectors.toList());
 
-        return getLastTestFulfillment(testEvents);
+        return String.valueOf(getLastTestFulfillment(testEvents));
     }
 
     private double getLastTestFulfillment(List<Entry> testEvents) {

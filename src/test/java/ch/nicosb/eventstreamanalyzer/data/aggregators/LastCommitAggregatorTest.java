@@ -46,13 +46,13 @@ public class LastCommitAggregatorTest {
         List<IIDEEvent> events = new ArrayList<>();
         events.add(event);
 
-        double expected = 0.0d;
+        String expected = "0.0";
 
         // when
-        double actual = aggregator.aggregateValue(events, event);
+        String actual = aggregator.aggregateValue(events, event);
 
         // then
-        assertEquals(expected, actual, 0);
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -71,13 +71,13 @@ public class LastCommitAggregatorTest {
         List<IIDEEvent> events = new ArrayList<>();
         events.add(commitEvent);
 
-        double expected = 0.0d;
+        String expected = "0.0";
 
         // when
-        double actual = aggregator.aggregateValue(events, commitEvent);
+        String actual = aggregator.aggregateValue(events, commitEvent);
 
         // then
-        assertEquals(expected, actual, 0);
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -103,12 +103,14 @@ public class LastCommitAggregatorTest {
         events.add(commitEvent);
         events.add(laterEvent);
 
+        String expected = "10.0";
+
         // when
         aggregator.aggregateValue(events, commitEvent);
-        double actual = aggregator.aggregateValue(events, laterEvent);
+        String actual = aggregator.aggregateValue(events, laterEvent);
 
         // then
-        assertEquals(difference, actual, 0);
+        assertEquals("10.0", actual);
     }
 
 
@@ -126,14 +128,14 @@ public class LastCommitAggregatorTest {
         events.add(event);
         events.add(laterEvent);
 
-        double expected = timeout;
+        String expected = "10.0";
 
         // when
         aggregator.aggregateValue(events, event);
-        double actual = aggregator.aggregateValue(events, laterEvent);
+        String actual = aggregator.aggregateValue(events, laterEvent);
 
         // then
-        assertEquals(expected, actual, 0);
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -149,13 +151,13 @@ public class LastCommitAggregatorTest {
         events.add(event);
         events.add(laterEvent);
 
-        double expected = 0.0d;
+        String expected = "0.0";
 
         // when
         aggregator.aggregateValue(events, event);
-        double actual = aggregator.aggregateValue(events, laterEvent);
+        String actual = aggregator.aggregateValue(events, laterEvent);
 
         // then
-        assertEquals(expected, actual, 0);
+        assertEquals(expected, actual);
     }
 }

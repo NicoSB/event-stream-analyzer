@@ -17,7 +17,7 @@ package ch.nicosb.eventstreamanalyzer.visualization;
 
 import cc.kave.commons.model.events.IIDEEvent;
 import ch.nicosb.eventstreamanalyzer.Execution;
-import ch.nicosb.eventstreamanalyzer.parser.EventParser;
+import ch.nicosb.eventstreamanalyzer.parser.ZipUtils;
 import ch.nicosb.eventstreamanalyzer.stream.EventStream;
 import ch.nicosb.eventstreamanalyzer.stream.CompactEvent;
 import ch.nicosb.eventstreamanalyzer.stream.EventListTransformer;
@@ -36,15 +36,15 @@ public class Visualization implements Execution {
     public void execute(String[] args) {
         String folderUri = args.length == 3 ? args[2] : DEFAULT_FOLDER_URI;
 
-        String folder = args[1];
-        List<EventStream> streams = EventParser.parseDirectory(folder);
-
-        int i = 0;
-        for (EventStream stream : streams) {
-            String fileName = i++ + "_" + stream.getTitle() + PNG;
-            ensureFolderExists(folderUri);
-            drawImage(folderUri, fileName, stream.getEvents());
-        }
+//        String folder = args[1];
+//        List<EventStream> streams = ZipUtils.parseDirectory(folder);
+//
+//        int i = 0;
+//        for (EventStream stream : streams) {
+//            String fileName = i++ + "_" + stream.getTitle() + PNG;
+//            ensureFolderExists(folderUri);
+//            drawImage(folderUri, fileName, stream.getEvents());
+//        }
     }
 
     private void ensureFolderExists(String folderUri) {

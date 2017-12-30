@@ -40,11 +40,11 @@ public class MapToArffConverterTest {
     private static final String ATTRIBUTE_KEY = "@ATTRIBUTE ";
     private static final String RELATION_KEY = "@RELATION ";
     private static final String DATA_KEY = "@DATA";
-    private static final String FILE_URI = "test.arff";
+    private static final String FILE_URI = "MapTest.arff";
     private static final String RELATION = "relation";
 
     private MapToArffConverter converter;
-    private HashMap<String, Double> map;
+    private HashMap<String, String> map;
 
     @Before
     public void setUp() {
@@ -54,10 +54,10 @@ public class MapToArffConverterTest {
     }
 
     private void initMap() {
-        map.put(ATTR_1, 1.0d);
-        map.put(ATTR_2, 2.0d);
-        map.put(ATTR_3, 3.0d);
-        map.put(ATTR_4, 4.0d);
+        map.put(ATTR_1, "1.0");
+        map.put(ATTR_2, "2.0");
+        map.put(ATTR_3, "3.0");
+        map.put(ATTR_4, "4.0");
     }
 
     @Test
@@ -127,7 +127,7 @@ public class MapToArffConverterTest {
     @Test(expected = IllegalArgumentException.class)
     public void whenMapWithDifferentKeysIsAdded_throwsIllegalArgumentException() {
         // given
-        HashMap<String, Double> map2 = new HashMap<>();
+        HashMap<String, String> map2 = new HashMap<>();
 
         // when
         converter.add(map);

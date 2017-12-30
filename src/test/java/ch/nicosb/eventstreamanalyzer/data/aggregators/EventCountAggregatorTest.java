@@ -46,12 +46,14 @@ public class EventCountAggregatorTest {
         events.add(event1);
         events.add(event2);
 
+        String expected = "2";
+
         // when
         aggregator.aggregateValue(events, events.get(0));
-        double actual = aggregator.aggregateValue(events, events.get(events.size() - 1));
+        String actual = aggregator.aggregateValue(events, events.get(events.size() - 1));
 
         // then
-        assertEquals(2.0d, actual, 0.00001d);
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -64,12 +66,14 @@ public class EventCountAggregatorTest {
         events.add(event1);
         events.add(event2);
 
+        String expected = "1";
+
         // when
         aggregator.aggregateValue(events, events.get(0));
-        double actual = aggregator.aggregateValue(events, events.get(events.size() - 1));
+        String actual = aggregator.aggregateValue(events, events.get(events.size() - 1));
 
         // then
-        assertEquals(1.0d, actual, 0.00001d);
+        assertEquals(expected, actual);
     }
 }
 

@@ -30,11 +30,11 @@ public class HasEventAggregator extends EntryAggregator {
     }
 
     @Override
-    public double aggregateValue(List<Entry> events) {
+    public String aggregateValue(List<Entry> events) {
         Optional<Entry> optional = events.stream()
                 .filter(entry -> clazz.isInstance(entry.getEvent()))
                 .findFirst();
 
-        return optional.isPresent() ? 1.0 : 0.0;
+        return optional.isPresent() ? "1.0" : "0.0";
     }
 }

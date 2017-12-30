@@ -31,5 +31,5 @@ public abstract class Aggregator {
         return title;
     }
 
-    public abstract double aggregateValue(List<IIDEEvent> events, IIDEEvent event);
+    public abstract String aggregateValue(List<IIDEEvent> events, IIDEEvent event);
 }

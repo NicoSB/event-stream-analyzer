@@ -29,7 +29,7 @@ public class MapToArffConverter {
 
     private String fileUri;
     private String relation;
-    private List<HashMap<String, Double>> maps;
+    private List<HashMap<String, String>> maps;
 
     public MapToArffConverter(String relation, String fileUri) {
         this.relation = relation;
@@ -76,12 +76,12 @@ public class MapToArffConverter {
         writer.newLine();
         writer.newLine();
 
-        for (HashMap<String, Double> map : maps) {
+        for (HashMap<String, String> map : maps) {
             writeDataRow(map, keys, writer);
         }
     }
 
-    private void writeDataRow(HashMap<String, Double> map, Set<String> keys, BufferedWriter writer) throws IOException {
+    private void writeDataRow(HashMap<String, String> map, Set<String> keys, BufferedWriter writer) throws IOException {
         for (Iterator<String> it = keys.iterator(); it.hasNext(); ) {
             String key = it.next();
             String value = String.valueOf(map.get(key));
@@ -94,12 +94,12 @@ public class MapToArffConverter {
         writer.newLine();
     }
 
-    public void add(HashMap<String, Double> map) throws IllegalArgumentException {
+    public void add(HashMap<String, String> map) throws IllegalArgumentException {
         validateMap(map);
         maps.add(map);
     }
 
-    private void validateMap(HashMap<String, Double> map) throws IllegalArgumentException {
+    private void validateMap(HashMap<String, String> map) throws IllegalArgumentException {
         if (maps.isEmpty())
             return;
 
@@ -107,11 +107,11 @@ public class MapToArffConverter {
             throw new IllegalArgumentException(createErrorMessage(map));
     }
 
-    private boolean doKeysMatch(HashMap<String, Double> map1, HashMap<String, Double> map2) {
+    private boolean doKeysMatch(HashMap<String, String> map1, HashMap<String, String> map2) {
         return map1.keySet().equals(map2.keySet());
     }
 
-    private String createErrorMessage(HashMap<String, Double> map) {
+    private String createErrorMessage(HashMap<String, String> map) {
         return String.format("All maps must have the same keys! Expected: %s - Actual: %s",
                 maps.get(0).keySet(), map.keySet());
     }
