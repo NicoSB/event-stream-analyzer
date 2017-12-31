@@ -51,7 +51,7 @@ public class QueueProcessor implements Runnable {
 
     @Override
     public void run() {
-        while(!cancelled || queue.size() > 0) {
+        while(isRunning()) {
             try {
                 processNextEvent();
             } catch (IOException e) {
@@ -70,12 +70,20 @@ public class QueueProcessor implements Runnable {
         Map<String, String> map = new HashMap<>();
         IIDEEvent event = queue.poll();
         if (event != null) {
-            aggregators.forEach(aggregator -> map.put(aggregator.getTitle(), aggregator.aggregateValue(null, event)));
-            arffWriter.writeData(map);
+            tryExtractAndWriteValues(map, event);
         }
     }
 
-    public boolean isRunning() {
-        return !cancelled;
+    private void tryExtractAndWriteValues(Map<String, String> map, IIDEEvent event) {
+        try {
+            aggregators.forEach(aggregator -> map.put(aggregator.getTitle(), aggregator.aggregateValue(null, event)));
+            arffWriter.writeData(map);
+        } catch (Exception e) {
+            System.err.println("Failed to write event: " + event.toString());
+        }
+    }
+
+    private boolean isRunning() {
+        return !cancelled || queue.size() > 0;
     }
 }

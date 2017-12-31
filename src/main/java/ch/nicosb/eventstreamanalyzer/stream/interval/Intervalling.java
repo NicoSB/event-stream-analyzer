@@ -18,10 +18,7 @@ package ch.nicosb.eventstreamanalyzer.stream.interval;
 import cc.kave.commons.model.events.visualstudio.BuildEvent;
 import ch.nicosb.eventstreamanalyzer.Execution;
 import ch.nicosb.eventstreamanalyzer.data.*;
-import ch.nicosb.eventstreamanalyzer.data.aggregators.Aggregator;
-import ch.nicosb.eventstreamanalyzer.data.aggregators.EventCountAggregator;
-import ch.nicosb.eventstreamanalyzer.data.aggregators.LastBuildAggregator;
-import ch.nicosb.eventstreamanalyzer.data.aggregators.LastCommitAggregator;
+import ch.nicosb.eventstreamanalyzer.data.aggregators.*;
 import ch.nicosb.eventstreamanalyzer.data.aggregators.entryaggregators.*;
 import ch.nicosb.eventstreamanalyzer.parser.ListeningEventQueue;
 import ch.nicosb.eventstreamanalyzer.parser.NotifyingZipParser;
@@ -84,6 +81,9 @@ public class Intervalling implements Execution {
 
         Aggregator timeSinceLastCommitAggregator = new LastCommitAggregator(twoMinutes);
         processor.registerAggregator(timeSinceLastCommitAggregator);
+
+        Aggregator lastSuccessfulTestWithinAggregator = new LastSuccessfulTestWithinAggregator(twoMinutes);
+        processor.registerAggregator(lastSuccessfulTestWithinAggregator);
     }
 
     private List<Entry> aggregateStream(EventStream stream) {

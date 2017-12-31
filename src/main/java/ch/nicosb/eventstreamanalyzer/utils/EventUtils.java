@@ -20,6 +20,7 @@ import cc.kave.commons.model.events.versioncontrolevents.VersionControlAction;
 import cc.kave.commons.model.events.versioncontrolevents.VersionControlActionType;
 import cc.kave.commons.model.events.versioncontrolevents.VersionControlEvent;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 
 public class EventUtils {
@@ -38,5 +39,13 @@ public class EventUtils {
         }
 
         return false;
+    }
+
+    public static ZonedDateTime getEnd(IIDEEvent event) {
+        try {
+            return event.getTerminatedAt();
+        } catch (Exception e) {
+            return event.getTriggeredAt();
+        }
     }
 }

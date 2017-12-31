@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.when;
 
 public class EventUtilsTest {
 
@@ -76,5 +77,46 @@ public class EventUtilsTest {
 
         // then
         assertFalse(actual);
+    }
+
+
+    @Test
+    public void whenGetTerminatedAtSucceeds_returnsTerminatedAt() {
+        // given
+        ZonedDateTime now = ZonedDateTime.now();
+        IIDEEvent event = new TestEvent(now);
+
+        // when
+        ZonedDateTime actual = EventUtils.getEnd(event);
+
+        // then
+        assertEquals(now, actual);
+    }
+
+    @Test
+    public void whenGetTerminatedAtThrows_returnsTriggeredAt() {
+        // given
+        ZonedDateTime now = ZonedDateTime.now();
+        IIDEEvent event = createFailingEvent(now);
+
+        // when
+        ZonedDateTime actual = EventUtils.getEnd(event);
+
+        // then
+        assertEquals(now, actual);
+    }
+
+    private IIDEEvent createFailingEvent(ZonedDateTime now) {
+        return new IIDEEvent() {
+                @Override
+                public ZonedDateTime getTriggeredAt() {
+                    return now;
+                }
+
+                @Override
+                public ZonedDateTime getTerminatedAt() {
+                    return now.plus(null);
+                }
+            };
     }
 }
