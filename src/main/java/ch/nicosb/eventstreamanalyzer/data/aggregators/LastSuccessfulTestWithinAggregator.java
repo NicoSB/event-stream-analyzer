@@ -21,7 +21,6 @@ import cc.kave.commons.model.events.testrunevents.TestResult;
 import cc.kave.commons.model.events.testrunevents.TestRunEvent;
 import ch.nicosb.eventstreamanalyzer.utils.EventUtils;
 
-import java.time.ZonedDateTime;
 import java.util.List;
 
 public class LastSuccessfulTestWithinAggregator extends NominalAggregator {

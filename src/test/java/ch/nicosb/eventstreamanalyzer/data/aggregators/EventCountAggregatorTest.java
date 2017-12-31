@@ -16,7 +16,6 @@
 package ch.nicosb.eventstreamanalyzer.data.aggregators;
 
 import cc.kave.commons.model.events.IIDEEvent;
-import ch.nicosb.eventstreamanalyzer.stream.TriggeredAtComparator;
 import ch.nicosb.eventstreamanalyzer.testutils.TestEvent;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,7 +39,7 @@ public class EventCountAggregatorTest {
     public void whenEventIsAggregated_returnsCorrectValue() {
         // given
         IIDEEvent event1 = new TestEvent(ZonedDateTime.now());
-        IIDEEvent event2 = new TestEvent(ZonedDateTime.now());
+        IIDEEvent event2 = new TestEvent(ZonedDateTime.now().plusSeconds(1));
 
         ArrayList<IIDEEvent> events = new ArrayList<>();
         events.add(event1);

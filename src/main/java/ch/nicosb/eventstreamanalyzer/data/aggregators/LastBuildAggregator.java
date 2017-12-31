@@ -17,6 +17,7 @@ package ch.nicosb.eventstreamanalyzer.data.aggregators;
 
 import cc.kave.commons.model.events.IIDEEvent;
 import cc.kave.commons.model.events.visualstudio.BuildEvent;
+import ch.nicosb.eventstreamanalyzer.utils.EventUtils;
 
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class LastBuildAggregator extends Aggregator{
     private int timeout;
 
     private double activeTimeSinceLastBuild = 0;
-    private long lastEventEpochTime = -1;
+    private long lastEventEnd = -1;
 
     public LastBuildAggregator(int timeout) {
         super(TITLE);
@@ -34,20 +35,22 @@ public class LastBuildAggregator extends Aggregator{
 
     @Override
     public String aggregateValue(List<IIDEEvent> events, IIDEEvent event) {
-        if (event instanceof BuildEvent || lastEventEpochTime == -1) {
-            lastEventEpochTime = event.getTriggeredAt().toEpochSecond();
+        if (event instanceof BuildEvent || lastEventEnd == -1) {
+            lastEventEnd = EventUtils.getEnd(event).toEpochSecond();
             activeTimeSinceLastBuild = 0;
             return String.valueOf(activeTimeSinceLastBuild);
         }
 
-        long eventEpochTime = event.getTriggeredAt().toEpochSecond();
-        long differenceInSeconds = eventEpochTime - lastEventEpochTime;
+        long eventStart = event.getTriggeredAt().toEpochSecond();
+        long eventEnd = EventUtils.getEnd(event).toEpochSecond();
+
+        long differenceInSeconds = eventStart - lastEventEnd;
 
         if (differenceInSeconds <= timeout) {
-            activeTimeSinceLastBuild += differenceInSeconds;
+            activeTimeSinceLastBuild += eventEnd - lastEventEnd;
         }
 
-        lastEventEpochTime = eventEpochTime;
+        lastEventEnd = eventEnd;
 
         return String.valueOf(activeTimeSinceLastBuild);
     }

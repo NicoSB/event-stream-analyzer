@@ -43,7 +43,7 @@ public class EventUtils {
 
     public static ZonedDateTime getEnd(IIDEEvent event) {
         try {
-            return event.getTerminatedAt();
+            return event.getTerminatedAt() != null ? event.getTerminatedAt() : event.getTriggeredAt();
         } catch (Exception e) {
             return event.getTriggeredAt();
         }

@@ -15,19 +15,12 @@
  */
 package ch.nicosb.eventstreamanalyzer.parser;
 
-import cc.kave.commons.model.events.IDEEvent;
-import cc.kave.commons.model.events.IIDEEvent;
-import cc.kave.commons.utils.io.IReadingArchive;
-import cc.kave.commons.utils.io.ReadingArchive;
-import ch.nicosb.eventstreamanalyzer.stream.EventStream;
-import ch.nicosb.eventstreamanalyzer.stream.TriggeredAtComparator;
 import ch.nicosb.eventstreamanalyzer.utils.FileSystemUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeSet;
 
 public class ZipUtils {
 

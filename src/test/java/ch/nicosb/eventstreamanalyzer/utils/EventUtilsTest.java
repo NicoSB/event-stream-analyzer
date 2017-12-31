@@ -97,7 +97,7 @@ public class EventUtilsTest {
     public void whenGetTerminatedAtThrows_returnsTriggeredAt() {
         // given
         ZonedDateTime now = ZonedDateTime.now();
-        IIDEEvent event = createFailingEvent(now);
+        IIDEEvent event = createThrowingEvent(now);
 
         // when
         ZonedDateTime actual = EventUtils.getEnd(event);
@@ -106,17 +106,44 @@ public class EventUtilsTest {
         assertEquals(now, actual);
     }
 
-    private IIDEEvent createFailingEvent(ZonedDateTime now) {
+    private IIDEEvent createThrowingEvent(ZonedDateTime now) {
         return new IIDEEvent() {
-                @Override
-                public ZonedDateTime getTriggeredAt() {
-                    return now;
-                }
+            @Override
+            public ZonedDateTime getTriggeredAt() {
+                return now;
+            }
 
-                @Override
-                public ZonedDateTime getTerminatedAt() {
-                    return now.plus(null);
-                }
-            };
+            @Override
+            public ZonedDateTime getTerminatedAt() {
+                return now.plus(null);
+            }
+        };
+    }
+
+    @Test
+    public void whenGetTerminatedReturnsNull_returnsTriggeredAt() {
+        // given
+        ZonedDateTime now = ZonedDateTime.now();
+        IIDEEvent event = createNullEvent(now);
+
+        // when
+        ZonedDateTime actual = EventUtils.getEnd(event);
+
+        // then
+        assertEquals(now, actual);
+    }
+
+    private IIDEEvent createNullEvent(ZonedDateTime now) {
+        return new IIDEEvent() {
+            @Override
+            public ZonedDateTime getTriggeredAt() {
+                return now;
+            }
+
+            @Override
+            public ZonedDateTime getTerminatedAt() {
+                return null;
+            }
+        };
     }
 }

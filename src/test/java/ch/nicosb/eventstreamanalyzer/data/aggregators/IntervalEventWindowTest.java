@@ -65,7 +65,7 @@ public class IntervalEventWindowTest {
     public void whenEventIsAdded_sizeReturnsCorrectNumber() {
         // given
         IIDEEvent old = new TestEvent(ZonedDateTime.now());
-        IIDEEvent event = new TestEvent(ZonedDateTime.now());
+        IIDEEvent event = new TestEvent(ZonedDateTime.now().plusSeconds(1));
 
         // when
         window.add(old);

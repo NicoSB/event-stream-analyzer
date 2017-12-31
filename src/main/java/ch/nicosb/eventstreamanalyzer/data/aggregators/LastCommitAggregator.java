@@ -25,7 +25,7 @@ public class LastCommitAggregator extends Aggregator {
     private int timeout;
 
     private double activeTimeSinceLastCommit = 0;
-    private long lastEventEpochTime = -1;
+    private long lastEventEnd = -1;
 
     public LastCommitAggregator(int timeout) {
         super(TITLE);
@@ -34,20 +34,21 @@ public class LastCommitAggregator extends Aggregator {
 
     @Override
     public String aggregateValue(List<IIDEEvent> events, IIDEEvent event) {
-        if (EventUtils.isCommitEvent(event) || lastEventEpochTime == -1) {
-            lastEventEpochTime = event.getTriggeredAt().toEpochSecond();
+        if (EventUtils.isCommitEvent(event) || lastEventEnd == -1) {
+            lastEventEnd = EventUtils.getEnd(event).toEpochSecond();
             activeTimeSinceLastCommit = 0;
             return String.valueOf(activeTimeSinceLastCommit);
         }
 
-        long eventEpochTime = event.getTriggeredAt().toEpochSecond();
-        long differenceInSeconds = eventEpochTime - lastEventEpochTime;
+        long eventStart = event.getTriggeredAt().toEpochSecond();
+        long eventEnd = EventUtils.getEnd(event).toEpochSecond();
+        long differenceInSeconds = eventStart - lastEventEnd;
 
         if (differenceInSeconds <= timeout) {
-            activeTimeSinceLastCommit += differenceInSeconds;
+            activeTimeSinceLastCommit += eventEnd - lastEventEnd;
         }
 
-        lastEventEpochTime = eventEpochTime;
+        lastEventEnd = eventEnd;
 
         return String.valueOf(activeTimeSinceLastCommit);
     }
