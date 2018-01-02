@@ -22,6 +22,7 @@ import java.io.BufferedWriter;
 import java.io.Closeable;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.OpenOption;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
@@ -37,6 +38,7 @@ public class ArffWriter implements Closeable{
     private Set<Aggregator> aggregators;
     private String fileName;
     private BufferedWriter writer;
+    private int counter = 0;
 
     public ArffWriter(TreeSet<Aggregator> aggregators, String fileName) {
         this.aggregators = aggregators;

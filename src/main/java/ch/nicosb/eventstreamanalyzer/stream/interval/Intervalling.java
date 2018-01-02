@@ -26,6 +26,7 @@ import ch.nicosb.eventstreamanalyzer.parser.ZipUtils;
 import ch.nicosb.eventstreamanalyzer.stream.EventStream;
 import ch.nicosb.eventstreamanalyzer.stream.Session;
 import ch.nicosb.eventstreamanalyzer.stream.Sessionizer;
+import ch.nicosb.eventstreamanalyzer.utils.PeriodicLogger;
 import ch.nicosb.eventstreamanalyzer.weka.MapToArffConverter;
 
 import java.io.IOException;
@@ -62,12 +63,17 @@ public class Intervalling implements Execution {
         ListeningEventQueue queue = new ListeningEventQueue(path.getFileName().toString());
         QueueProcessor processor = new QueueProcessor(queue);
 
+        PeriodicLogger logger = new PeriodicLogger(5);
+        logger.registerProvider(parser);
+        logger.registerProvider(processor);
+
         registerAggregators(processor);
         parser.subscribe(queue);
 
         processor.start();
         parser.parse();
         processor.stop();
+        logger.stop();
     }
 
     private void registerAggregators(QueueProcessor processor) {
@@ -84,6 +90,9 @@ public class Intervalling implements Execution {
 
         Aggregator lastSuccessfulTestWithinAggregator = new LastSuccessfulTestWithinAggregator(twoMinutes);
         processor.registerAggregator(lastSuccessfulTestWithinAggregator);
+
+        Aggregator isCommitEventAggregator = new IsCommitEventAggregator();
+        processor.registerAggregator(isCommitEventAggregator);
     }
 
     private List<Entry> aggregateStream(EventStream stream) {

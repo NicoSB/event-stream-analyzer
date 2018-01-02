@@ -18,16 +18,18 @@ package ch.nicosb.eventstreamanalyzer.stream.interval;
 import cc.kave.commons.model.events.IIDEEvent;
 import ch.nicosb.eventstreamanalyzer.data.aggregators.Aggregator;
 import ch.nicosb.eventstreamanalyzer.parser.ListeningEventQueue;
+import ch.nicosb.eventstreamanalyzer.stream.util.StatusProvider;
 
 import java.io.IOException;
 import java.util.*;
 
-public class QueueProcessor implements Runnable {
+public class QueueProcessor implements Runnable, StatusProvider {
     private final String fileName;
     private TreeSet<Aggregator> aggregators = new TreeSet<>(Comparator.comparing(Aggregator::getTitle));
     private ArffWriter arffWriter;
     private ListeningEventQueue queue;
     private boolean cancelled;
+    private int counter = 0;
 
     public QueueProcessor(ListeningEventQueue queue) {
         cancelled = false;
@@ -66,11 +68,12 @@ public class QueueProcessor implements Runnable {
         }
     }
 
-    private void processNextEvent() throws IOException {
+    private synchronized void processNextEvent() throws IOException {
         Map<String, String> map = new HashMap<>();
-        IIDEEvent event = queue.poll();
-        if (event != null) {
-            tryExtractAndWriteValues(map, event);
+        if (queue.size() > 0) {
+            IIDEEvent event = queue.poll();
+            if (event != null)
+                tryExtractAndWriteValues(map, event);
         }
     }
 
@@ -78,6 +81,7 @@ public class QueueProcessor implements Runnable {
         try {
             aggregators.forEach(aggregator -> map.put(aggregator.getTitle(), aggregator.aggregateValue(null, event)));
             arffWriter.writeData(map);
+            counter++;
         } catch (Exception e) {
             System.err.println("Failed to write event: " + event.toString());
         }
@@ -85,5 +89,10 @@ public class QueueProcessor implements Runnable {
 
     private boolean isRunning() {
         return !cancelled || queue.size() > 0;
+    }
+
+    @Override
+    public String getStatus() {
+        return counter + " Events written.";
     }
 }

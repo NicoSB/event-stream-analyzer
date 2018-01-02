@@ -52,6 +52,6 @@ public class LastBuildAggregator extends Aggregator{
 
         lastEventEnd = eventEnd;
 
-        return String.valueOf(activeTimeSinceLastBuild);
+        return String.valueOf(activeTimeSinceLastBuild < 120 ? 1.0d : 1.0d);
     }
 }

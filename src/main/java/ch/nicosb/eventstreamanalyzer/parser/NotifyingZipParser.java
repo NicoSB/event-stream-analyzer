@@ -19,15 +19,17 @@ import cc.kave.commons.model.events.IDEEvent;
 import cc.kave.commons.model.events.IIDEEvent;
 import cc.kave.commons.utils.io.IReadingArchive;
 import cc.kave.commons.utils.io.ReadingArchive;
+import ch.nicosb.eventstreamanalyzer.stream.util.StatusProvider;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NotifyingZipParser implements Publisher{
+public class NotifyingZipParser implements Publisher, StatusProvider{
 
     private List<EventParsedListener> listeners;
     private Path filePath;
+    private IReadingArchive readingArchive;
     private int counter = 1;
 
     public NotifyingZipParser(Path filePath) {
@@ -45,13 +47,12 @@ public class NotifyingZipParser implements Publisher{
     private void parseEvents(Path file) {
         System.out.printf("Extracting events from %s.", file.toString());
 
-        IReadingArchive readingArchive = new ReadingArchive(file.toFile());
+        readingArchive = new ReadingArchive(file.toFile());
         int total = readingArchive.getNumberOfEntries();
         while (readingArchive.hasNext()) {
             IDEEvent event = readingArchive.getNext(IIDEEvent.class);
             onEventParsed(event, file.toString());
-
-            System.out.printf("%d/%d: Parsed event of type %s.\n", counter++, total, event.getClass().getName());
+            counter++;
         }
     }
 
@@ -67,5 +68,10 @@ public class NotifyingZipParser implements Publisher{
     @Override
     public void unsubscribe(EventParsedListener listener) {
         listeners.remove(listener);
+    }
+
+    @Override
+    public String getStatus() {
+        return String.format("%d\\%d Events parsed.", counter, readingArchive.getNumberOfEntries());
     }
 }

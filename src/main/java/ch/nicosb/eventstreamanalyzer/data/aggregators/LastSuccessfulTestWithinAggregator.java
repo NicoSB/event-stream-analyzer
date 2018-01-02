@@ -33,7 +33,7 @@ public class LastSuccessfulTestWithinAggregator extends NominalAggregator {
         super("Within" + seconds + "sOfLastSuccessfulTest");
         this.seconds = seconds;
         this.possibleValues = new String[]{TRUE, FALSE};
-        lastTestEventEpoch = Long.MIN_VALUE;
+        lastTestEventEpoch = 0;
     }
 
     @Override
