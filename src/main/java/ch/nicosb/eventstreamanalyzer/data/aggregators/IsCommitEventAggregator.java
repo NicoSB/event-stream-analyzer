@@ -18,20 +18,30 @@ package ch.nicosb.eventstreamanalyzer.data.aggregators;
 import cc.kave.commons.model.events.IIDEEvent;
 import ch.nicosb.eventstreamanalyzer.utils.EventUtils;
 
-import java.util.List;
+import java.util.*;
 
 public class IsCommitEventAggregator extends NominalAggregator {
 
-    private static final String TRUE = "t";
-    private static final String FALSE = "f";
+    static final String TRUE = "t";
+    static final String FALSE = "f";
+    private Set<String> titles;
 
     public IsCommitEventAggregator() {
-        super("IsCommitEvent");
         this.possibleValues = new String[]{TRUE, FALSE};
+        titles = new HashSet<>();
+        titles.add("IsCommitEvent");
     }
 
     @Override
-    public String aggregateValue(List<IIDEEvent> events, IIDEEvent event) {
-        return EventUtils.isCommitEvent(event) ? TRUE : FALSE;
+    public Map<String, String> aggregateValue(IIDEEvent event) {
+        Map<String, String> map = new HashMap<>();
+        map.put((String)titles.toArray()[0], EventUtils.isCommitEvent(event) ? TRUE : FALSE);
+
+        return map;
+    }
+
+    @Override
+    public Set<String> getTitles() {
+        return titles;
     }
 }

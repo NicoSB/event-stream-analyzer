@@ -35,14 +35,7 @@ import java.util.*;
 
 public class Intervalling implements Execution {
 
-    private List<IntervalPostProcessor> postProcessors;
-    private List<EntryAggregator> entryAggregators;
-    private MapToArffConverter converter;
-
-    public Intervalling() {
-        this.postProcessors = new ArrayList<>();
-        entryAggregators = new ArrayList<>();
-    }
+    private QueueProcessor processor;
 
     @Override
     public void execute(String[] args) {
@@ -61,13 +54,11 @@ public class Intervalling implements Execution {
     private void processZip(Path path) {
         NotifyingZipParser parser = new NotifyingZipParser(path);
         ListeningEventQueue queue = new ListeningEventQueue(path.getFileName().toString());
-        QueueProcessor processor = new QueueProcessor(queue);
+        processor = new QueueProcessor(queue);
 
-        PeriodicLogger logger = new PeriodicLogger(5);
-        logger.registerProvider(parser);
-        logger.registerProvider(processor);
+        PeriodicLogger logger = initLogger(parser);
 
-        registerAggregators(processor);
+        registerAggregators();
         parser.subscribe(queue);
 
         processor.start();
@@ -76,9 +67,16 @@ public class Intervalling implements Execution {
         logger.stop();
     }
 
-    private void registerAggregators(QueueProcessor processor) {
+    private PeriodicLogger initLogger(NotifyingZipParser parser) {
+        PeriodicLogger logger = new PeriodicLogger(5);
+        logger.registerProvider(parser);
+        logger.registerProvider(processor);
+        return logger;
+    }
+
+    private void registerAggregators() {
         int fiveMinutes = 5*60;
-        Aggregator eventCountAggregator = new EventCountAggregator("EventCount", fiveMinutes);
+        Aggregator eventCountAggregator = new EventCountAggregator(fiveMinutes);
         processor.registerAggregator(eventCountAggregator);
 
         int twoMinutes = 2*60;
@@ -93,117 +91,5 @@ public class Intervalling implements Execution {
 
         Aggregator isCommitEventAggregator = new IsCommitEventAggregator();
         processor.registerAggregator(isCommitEventAggregator);
-    }
-
-    private List<Entry> aggregateStream(EventStream stream) {
-        Traverser traverser = new TraverserImpl(stream.getEvents());
-
-        registerAggregator(traverser);
-        return traverser.traverse();
-    }
-
-    private void registerPostProcessors() {
-        FirstAndLastRemover remover = new FirstAndLastRemover(10*60);
-        postProcessors.add(remover);
-    }
-
-    private void registerAggregator(Traverser traverser) {
-        int fiveMinutes = 5*60;
-        Aggregator eventCountAggregator = new EventCountAggregator("EventCount", fiveMinutes);
-        traverser.register(eventCountAggregator);
-
-        int twoMinutes = 2*60;
-        Aggregator timeSinceLastBuildAggregator = new LastBuildAggregator(twoMinutes);
-        traverser.register(timeSinceLastBuildAggregator);
-
-        Aggregator timeSinceLastCommitAggregator = new LastCommitAggregator(twoMinutes);
-        traverser.register(timeSinceLastCommitAggregator);
-    }
-
-    private void initConverter(List<Entry> entries) {
-        converter = new MapToArffConverter("events", "test.arff");
-        entries.forEach(entry -> converter.add(entry.getFields()));
-    }
-
-    private void registerEntryAggregators() {
-        EntryAggregator hasBuildEventAggregator = new HasEventAggregator(BuildEvent.class);
-        entryAggregators.add(hasBuildEventAggregator);
-
-        EntryAggregator totalTestAggregator = new TotalTestCompletionRatioAggregator();
-        entryAggregators.add(totalTestAggregator);
-
-        EntryAggregator runTestAggregator = new RunTestCompletionRatioAggregator();
-        entryAggregators.add(runTestAggregator);
-
-        EntryAggregator commitEventAggregator = new HasCommitEventAggregator();
-        entryAggregators.add(commitEventAggregator);
-    }
-
-    private void processStream(EventStream stream) {
-        List<Entry> entries = aggregateStream(stream);
-        List<Session> sessions = getSessions(entries);
-
-        List<Interval> intervals = getIntervals(sessions);
-        List<Interval> relevantIntervals = getRelevantIntervals(intervals);
-
-        List<Entry> averagedEntries = averageEntries(relevantIntervals);
-
-        writeEntriesToFile(averagedEntries);
-    }
-
-    private void writeEntriesToFile(List<Entry> averagedEntries) {
-        initConverter(averagedEntries);
-        converter.writeFile();
-    }
-
-    private List<Interval> getRelevantIntervals(List<Interval> intervals) {
-        List<Interval> relevantIntervals = new ArrayList<>();
-
-        for(IntervalPostProcessor processor : postProcessors) {
-            relevantIntervals = processor.process(intervals);
-        }
-        return relevantIntervals;
-    }
-
-    private List<Entry> averageEntries(List<Interval> relevantIntervals) {
-        List<Entry> averagedEntries = new ArrayList<>();
-
-        relevantIntervals.forEach(interval -> {
-            Entry averaged = averageValues(interval.getEntries());
-            entryAggregators.forEach(agg ->
-                    averaged.put(agg.getTitle(), agg.aggregateValue(interval.getEntries())));
-            averagedEntries.add(averaged);
-        });
-
-        return averagedEntries;
-    }
-
-    private Entry averageValues(List<Entry> entries) {
-        Entry entry = new Entry();
-        for(String key : entries.get(0).getFields().keySet()) {
-            entry.put(key, averageValue(entries, key));
-        }
-
-        return entry;
-    }
-
-    private String averageValue(List<Entry> entries, String key) {
-        double sum = 0d;
-
-        for (Entry entry : entries) {
-            sum += Double.valueOf(entry.getFields().get(key));
-        }
-
-        return String.valueOf(sum / entries.size());
-    }
-
-    private List<Session> getSessions(List<Entry> events) {
-        Sessionizer sessionizer = new Sessionizer(events, 10*60);
-        return sessionizer.extractSessions();
-    }
-
-    private List<Interval> getIntervals(List<Session> sessions) {
-        IntervalSplitter splitter = new IntervalSplitter(sessions, 15);
-        return splitter.split();
     }
 }

@@ -18,28 +18,28 @@ package ch.nicosb.eventstreamanalyzer.data.aggregators;
 import cc.kave.commons.model.events.IIDEEvent;
 import ch.nicosb.eventstreamanalyzer.utils.EventUtils;
 
-import java.util.List;
+import java.util.*;
 
 public class LastCommitAggregator extends Aggregator {
-    private static final String TITLE = "SecsSinceLastCommit";
-    private int timeout;
+    static final String TITLE = "SecsSinceLastCommit";
 
+    private Set<String> titles;
+    private int timeout;
     private double activeTimeSinceLastCommit = 0;
     private long lastEventEnd = -1;
 
     public LastCommitAggregator(int timeout) {
-        super(TITLE);
         this.timeout = timeout;
+        titles = new HashSet<>();
+        titles.add(TITLE);
     }
 
-    @Override
-    public String aggregateValue(List<IIDEEvent> events, IIDEEvent event) {
-        if (EventUtils.isCommitEvent(event) || lastEventEnd == -1) {
-            lastEventEnd = EventUtils.getEnd(event).toEpochSecond();
-            activeTimeSinceLastCommit = 0;
-            return String.valueOf(activeTimeSinceLastCommit);
-        }
+    private void setActiveTimeToZero(IIDEEvent event) {
+        lastEventEnd = EventUtils.getEnd(event).toEpochSecond();
+        activeTimeSinceLastCommit = 0;
+    }
 
+    private void calculateActiveTime(IIDEEvent event) {
         long eventStart = event.getTriggeredAt().toEpochSecond();
         long eventEnd = EventUtils.getEnd(event).toEpochSecond();
         long differenceInSeconds = eventStart - lastEventEnd;
@@ -49,7 +49,24 @@ public class LastCommitAggregator extends Aggregator {
         }
 
         lastEventEnd = eventEnd;
+    }
 
-        return String.valueOf(activeTimeSinceLastCommit);
+    @Override
+    public Map<String, String> aggregateValue(IIDEEvent event) {
+        Map<String, String> map = new HashMap<>();
+        if (EventUtils.isCommitEvent(event) || lastEventEnd == -1) {
+            setActiveTimeToZero(event);
+        } else {
+            calculateActiveTime(event);
+        }
+
+        map.put(TITLE, String.valueOf(activeTimeSinceLastCommit));
+
+        return map;
+    }
+
+    @Override
+    public Set<String> getTitles() {
+        return titles;
     }
 }

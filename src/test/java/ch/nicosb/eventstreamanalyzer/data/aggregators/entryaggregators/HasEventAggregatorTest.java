@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package ch.nicosb.eventstreamanalyzer.data.aggregators;
+package ch.nicosb.eventstreamanalyzer.data.aggregators.entryaggregators;
 
 import cc.kave.commons.model.events.IIDEEvent;
 import cc.kave.commons.model.events.visualstudio.BuildEvent;

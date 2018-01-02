@@ -25,11 +25,12 @@ import java.util.*;
 
 public class QueueProcessor implements Runnable, StatusProvider {
     private final String fileName;
-    private TreeSet<Aggregator> aggregators = new TreeSet<>(Comparator.comparing(Aggregator::getTitle));
+    private Set<Aggregator> aggregators = new HashSet<>();
     private ArffWriter arffWriter;
     private ListeningEventQueue queue;
     private boolean cancelled;
     private int counter = 0;
+    private int failures = 0;
 
     public QueueProcessor(ListeningEventQueue queue) {
         cancelled = false;
@@ -69,21 +70,30 @@ public class QueueProcessor implements Runnable, StatusProvider {
     }
 
     private synchronized void processNextEvent() throws IOException {
-        Map<String, String> map = new HashMap<>();
         if (queue.size() > 0) {
             IIDEEvent event = queue.poll();
             if (event != null)
-                tryExtractAndWriteValues(map, event);
+                tryExtractAndWriteValues(event);
         }
     }
 
-    private void tryExtractAndWriteValues(Map<String, String> map, IIDEEvent event) {
+    private void tryExtractAndWriteValues(IIDEEvent event) {
         try {
-            aggregators.forEach(aggregator -> map.put(aggregator.getTitle(), aggregator.aggregateValue(null, event)));
-            arffWriter.writeData(map);
-            counter++;
+            Map<String, String> combinedMap = new HashMap<>();
+            aggregators.forEach(aggregator -> combinedMap.putAll(aggregator.aggregateValue(event)));
+            tryMapWrite(combinedMap);
         } catch (Exception e) {
             System.err.println("Failed to write event: " + event.toString());
+        }
+    }
+
+    private void tryMapWrite(Map<String, String> map) {
+        try {
+            arffWriter.writeData(map);
+            counter++;
+        } catch (IOException e) {
+            e.printStackTrace();
+            failures++;
         }
     }
 
@@ -93,6 +103,6 @@ public class QueueProcessor implements Runnable, StatusProvider {
 
     @Override
     public String getStatus() {
-        return counter + " Events written.";
+        return String.format("%d Events written. %d errors.", counter, failures);
     }
 }

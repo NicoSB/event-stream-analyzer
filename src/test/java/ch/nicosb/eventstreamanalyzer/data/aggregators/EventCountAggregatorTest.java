@@ -22,17 +22,21 @@ import org.junit.Test;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.Set;
 
+import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 
 
 public class EventCountAggregatorTest {
 
+    public static final int WINDOW_SIZE = 300;
     private EventCountAggregator aggregator;
 
     @Before
     public void setUp() {
-        aggregator = new EventCountAggregator("Title", 300);
+        aggregator = new EventCountAggregator(WINDOW_SIZE);
     }
 
     @Test
@@ -48,11 +52,12 @@ public class EventCountAggregatorTest {
         String expected = "2";
 
         // when
-        aggregator.aggregateValue(events, events.get(0));
-        String actual = aggregator.aggregateValue(events, events.get(events.size() - 1));
+        aggregator.aggregateValue(events.get(0));
+        Map actual = aggregator.aggregateValue(events.get(events.size() - 1));
 
         // then
-        assertEquals(expected, actual);
+        assertEquals(1, actual.size());
+        assertTrue(actual.containsValue(expected));
     }
 
     @Test
@@ -68,11 +73,58 @@ public class EventCountAggregatorTest {
         String expected = "1";
 
         // when
-        aggregator.aggregateValue(events, events.get(0));
-        String actual = aggregator.aggregateValue(events, events.get(events.size() - 1));
+        aggregator.aggregateValue(events.get(0));
+        Map result = aggregator.aggregateValue(events.get(events.size() - 1));
 
         // then
-        assertEquals(expected, actual);
+        assertEquals(1, result.size());
+        assertTrue(result.containsValue(expected));
     }
+
+    @Test
+    public void whenHasMultipleWindows_returnsMultipleValues() {
+        // given
+        int longerWindowSize = WINDOW_SIZE + 10;
+        aggregator = new EventCountAggregator(WINDOW_SIZE, longerWindowSize);
+        IIDEEvent event1 = new TestEvent(ZonedDateTime.now().minusSeconds(WINDOW_SIZE + 1));
+        IIDEEvent event2 = new TestEvent(ZonedDateTime.now());
+
+        ArrayList<IIDEEvent> events = new ArrayList<>();
+        events.add(event1);
+        events.add(event2);
+
+        String title1 = "EventsInLast" + WINDOW_SIZE + "s";
+        String title2 = "EventsInLast" + longerWindowSize + "s";
+
+        String expected1 = "1";
+        String expected2 = "2";
+
+        // when
+        aggregator.aggregateValue(events.get(0));
+        Map<String, String> result = aggregator.aggregateValue(events.get(events.size() - 1));
+
+        // then
+        assertEquals(2, result.size());
+        assertEquals(expected1, result.get(title1));
+        assertEquals(expected2, result.get(title2));
+    }
+
+    @Test
+    public void returnsCorrectTitles() {
+        // given
+        int longerWindowSize = WINDOW_SIZE + 10;
+        aggregator = new EventCountAggregator(WINDOW_SIZE, longerWindowSize);
+
+        String title1 = "EventsInLast" + WINDOW_SIZE + "s";
+        String title2 = "EventsInLast" + longerWindowSize + "s";
+
+        // when
+        Set<String> actual = aggregator.getTitles();
+
+        // then
+        assertTrue(actual.contains(title1));
+        assertTrue(actual.contains(title2));
+    }
+
 }
 

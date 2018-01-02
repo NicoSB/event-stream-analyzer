@@ -55,7 +55,7 @@ public class DataAggregation implements Execution {
 
     private void registerAggregators(Traverser traverser) {
         int fiveMinutes = 5*60;
-        Aggregator eventCountAggregator = new EventCountAggregator("EventCount", fiveMinutes);
+        Aggregator eventCountAggregator = new EventCountAggregator(fiveMinutes);
         traverser.register(eventCountAggregator);
 
         int twoMinutes = 2*60;

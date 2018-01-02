@@ -22,11 +22,14 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
 public class IsCommitEventAggregatorTest {
 
+    public static final String EXPECTED_TITLE = "IsCommitEvent";
     private IsCommitEventAggregator aggregator;
 
     @Before
@@ -34,6 +37,18 @@ public class IsCommitEventAggregatorTest {
         aggregator = new IsCommitEventAggregator();
     }
 
+    @Test
+    public void returnsCorrectTitles() {
+        // given
+        String expected = "IsCommitEvent";
+
+        // when
+        Set<String> actual = aggregator.getTitles();
+
+        // then
+        assertEquals(1, actual.size());
+        assertTrue(actual.contains(expected));
+    }
     @Test
     public void whenIsCommitEvent_returnsT() {
         // given
@@ -44,13 +59,13 @@ public class IsCommitEventAggregatorTest {
         event.Actions = new ArrayList<>();
         event.Actions.add(action);
 
-        String expected = "t";
+        String expected = IsCommitEventAggregator.TRUE;
 
         // when
-        String actual = aggregator.aggregateValue(null, event);
+        Map<String, String> result = aggregator.aggregateValue(event);
 
         // then
-        assertEquals(expected, actual);
+        assertEquals(expected, result.get(EXPECTED_TITLE));
     }
 
     @Test
@@ -63,19 +78,19 @@ public class IsCommitEventAggregatorTest {
         event.Actions = new ArrayList<>();
         event.Actions.add(action);
 
-        String expected = "f";
+        String expected = IsCommitEventAggregator.FALSE;
 
         // when
-        String actual = aggregator.aggregateValue(null, event);
+        Map<String, String> result = aggregator.aggregateValue(event);
 
         // then
-        assertEquals(expected, actual);
+        assertEquals(expected, result.get(EXPECTED_TITLE));
     }
 
     @Test
     public void getPossibleValue_returnsTF() {
         // given
-        String[] expected = {"t", "f"};
+        String[] expected = {IsCommitEventAggregator.TRUE, IsCommitEventAggregator.FALSE};
 
         // when
         String[] actual = aggregator.getPossibleValues();

@@ -21,31 +21,42 @@ import cc.kave.commons.model.events.testrunevents.TestResult;
 import cc.kave.commons.model.events.testrunevents.TestRunEvent;
 import ch.nicosb.eventstreamanalyzer.utils.EventUtils;
 
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class LastSuccessfulTestWithinAggregator extends NominalAggregator {
-    public static final String TRUE = "t";
-    public static final String FALSE = "f";
-    int seconds;
+    static final String TRUE = "t";
+    static final String FALSE = "f";
+
+    private Map<Integer, String> titles;
+    private Set<Integer> windows;
     private long lastTestEventEpoch;
 
-    public LastSuccessfulTestWithinAggregator(int seconds) {
-        super("Within" + seconds + "sOfLastSuccessfulTest");
-        this.seconds = seconds;
+    public LastSuccessfulTestWithinAggregator(int... seconds) {
+        titles = new HashMap<>();
+        windows = new TreeSet<>();
+        init(seconds);
+
         this.possibleValues = new String[]{TRUE, FALSE};
         lastTestEventEpoch = 0;
     }
 
-    @Override
-    public String aggregateValue(List<IIDEEvent> events, IIDEEvent event) {
+    private void init(int[] seconds) {
+        for (int s : seconds) {
+            windows.add(s);
+            titles.put(s, String.format("Within%dsOfSuccessfulTest", s));
+        }
+    }
+
+    public boolean isWithinXSeconds(IIDEEvent event, int seconds) {
         long eventEpoch = EventUtils.getEnd(event).toEpochSecond();
 
         if (isSuccessfulTest(event)) {
             lastTestEventEpoch = eventEpoch;
-            return TRUE;
+            return true;
         }
 
-        return eventEpoch - lastTestEventEpoch <= seconds ? TRUE : FALSE;
+        return eventEpoch - lastTestEventEpoch <= seconds;
     }
 
     private boolean isSuccessfulTest(IIDEEvent event) {
@@ -59,5 +70,21 @@ public class LastSuccessfulTestWithinAggregator extends NominalAggregator {
         }
 
         return true;
+    }
+
+    @Override
+    public Map<String, String> aggregateValue(IIDEEvent event) {
+        Map<String, String> map = new HashMap<>();
+        windows.forEach(window -> map.put(titles.get(window), isWithinXSeconds(event, window) ? TRUE : FALSE));
+
+        return map;
+    }
+
+    @Override
+    public Set<String> getTitles() {
+        return titles.keySet()
+                .stream()
+                .map(key -> titles.get(key))
+                .collect(Collectors.toSet());
     }
 }

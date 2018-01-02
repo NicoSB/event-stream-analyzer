@@ -18,18 +18,10 @@ package ch.nicosb.eventstreamanalyzer.data.aggregators;
 import cc.kave.commons.model.events.IIDEEvent;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public abstract class Aggregator {
-    private String title;
-
-    public Aggregator(String title) {
-        this.title = title;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public abstract String aggregateValue(List<IIDEEvent> events, IIDEEvent event);
+    public abstract Map<String, String> aggregateValue(IIDEEvent event);
+    public abstract Set<String> getTitles();
 }

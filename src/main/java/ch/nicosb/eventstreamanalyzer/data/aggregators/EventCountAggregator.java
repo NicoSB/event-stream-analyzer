@@ -17,20 +17,41 @@ package ch.nicosb.eventstreamanalyzer.data.aggregators;
 
 import cc.kave.commons.model.events.IIDEEvent;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class EventCountAggregator extends Aggregator {
-    private IntervalEventWindow eventWindow;
+    private HashMap<String, IntervalEventWindow> eventWindows;
+    private Set<String> titles;
 
-    public EventCountAggregator(String title, int windowSizeInSeconds) {
-        super(title);
-        eventWindow = new IntervalEventWindow(windowSizeInSeconds);
+    public EventCountAggregator(int... windowSizes) {
+        titles = new HashSet<>();
+        eventWindows = new HashMap<>();
+        init(windowSizes);
+    }
+
+    private void init(int[] windowSizes) {
+        for(int size : windowSizes) {
+            String title = "EventsInLast" + size + "s";
+            titles.add(title);
+            eventWindows.put(title, new IntervalEventWindow(size));
+        }
     }
 
     @Override
-    public String aggregateValue(List<IIDEEvent> events, IIDEEvent event) {
-        eventWindow.add(event);
-        return String.valueOf(eventWindow.size());
+    public Map<String, String> aggregateValue(IIDEEvent event) {
+        Map<String, String> map = new HashMap<>();
+        titles.stream()
+                .sorted()
+                .forEach(title -> {
+                    eventWindows.get(title).add(event);
+                    map.put(title, String.valueOf(eventWindows.get(title).size()));
+                });
+
+        return map;
+    }
+
+    @Override
+    public Set<String> getTitles() {
+        return titles;
     }
 }

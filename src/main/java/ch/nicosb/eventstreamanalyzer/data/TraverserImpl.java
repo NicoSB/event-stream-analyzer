@@ -16,9 +16,11 @@
 package ch.nicosb.eventstreamanalyzer.data;
 
 import cc.kave.commons.model.events.IIDEEvent;
+import ch.nicosb.eventstreamanalyzer.data.aggregators.Aggregator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class TraverserImpl extends Traverser {
@@ -39,8 +41,14 @@ public class TraverserImpl extends Traverser {
         System.out.printf("Applying aggregators to event of type '%s'.\n", event.getClass().getName());
 
         Entry entry = new Entry(event);
-        aggregators.forEach(ag -> entry.put(ag.getTitle(), ag.aggregateValue(events, event)));
+        aggregators.forEach(ag -> putAll(entry, ag, event));
 
         entries.add(entry);
+    }
+
+    private void putAll(Entry entry, Aggregator ag, IIDEEvent event) {
+        Map<String, String> values = ag.aggregateValue(event);
+        values.keySet()
+                .forEach(key -> entry.put(key, values.get(key)));
     }
 }

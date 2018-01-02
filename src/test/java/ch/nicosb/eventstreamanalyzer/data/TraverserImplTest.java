@@ -25,8 +25,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -49,13 +48,20 @@ public class TraverserImplTest {
     @Before
     public void setUp() {
         initEvents();
-        when(aggregator.getTitle()).thenReturn(AGGREGATOR_TITLE);
-        when(aggregator.aggregateValue(any(), any())).thenReturn(VALUE);
+
+        initAggregator();
 
         visited = false;
 
         traverser = new TraverserImpl(events);
         traverser.register(aggregator);
+    }
+
+    private void initAggregator() {
+        Map<String, String> map = new HashMap<>();
+        map.put(AGGREGATOR_TITLE, VALUE);
+
+        when(aggregator.aggregateValue(any())).thenReturn(map);
     }
 
     @Test
@@ -86,11 +92,16 @@ public class TraverserImplTest {
     }
 
     private Aggregator createVisitedAggregator() {
-        return new Aggregator("VisitedAggregator") {
+        return new Aggregator() {
             @Override
-            public String aggregateValue(List<IIDEEvent> events, IIDEEvent event) {
+            public Map<String, String> aggregateValue(IIDEEvent event) {
                 visited = true;
-                return "1.0";
+                return new HashMap<>();
+            }
+
+            @Override
+            public Set<String> getTitles() {
+                return null;
             }
         };
     }

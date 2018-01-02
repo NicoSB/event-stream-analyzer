@@ -18,6 +18,7 @@ package ch.nicosb.eventstreamanalyzer.data.aggregators;
 import cc.kave.commons.model.events.IIDEEvent;
 import cc.kave.commons.model.events.visualstudio.BuildEvent;
 import ch.nicosb.eventstreamanalyzer.testutils.TestEvent;
+import org.hamcrest.core.Is;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,6 +28,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
@@ -50,34 +53,42 @@ public class LastBuildAggregatorTest {
     }
 
     @Test
+    public void returnsCorrectTitles() {
+        // given
+        String expected = LastBuildAggregator.TITLE;
+
+        // when
+        Set<String> actual = aggregator.getTitles();
+
+        // then
+        assertEquals(1, actual.size());
+        assertTrue(actual.contains(expected));
+    }
+
+    @Test
     public void whenEventIsBuildEvent_returnsZero() {
         // given
-        List<IIDEEvent> events = new ArrayList<>();
-        events.add(buildEvent);
-
         String expected = "0.0";
 
         // when
-        String actual = aggregator.aggregateValue(events, buildEvent);
+        Map<String, String> result = aggregator.aggregateValue(buildEvent);
 
         // then
-        assertEquals(expected, actual);
+        assertEquals(expected, result.get(LastBuildAggregator.TITLE));
     }
 
     @Test
     public void whenNoBuildEventPreceded_returnsZero() {
         // given
-        IIDEEvent buildEvent = new TestEvent(ZonedDateTime.now());
-        List<IIDEEvent> events = new ArrayList<>();
-        events.add(buildEvent);
+        IIDEEvent testEvent = new TestEvent(ZonedDateTime.now());
 
         String expected = "0.0";
 
         // when
-        String actual = aggregator.aggregateValue(events, buildEvent);
+        Map<String, String> result = aggregator.aggregateValue(testEvent);
 
         // then
-        assertEquals(expected, actual);
+        assertEquals(expected, result.get(LastBuildAggregator.TITLE));
     }
 
     @Test
@@ -86,19 +97,14 @@ public class LastBuildAggregatorTest {
         ZonedDateTime later = buildTime.plusSeconds(timeout);
 
         IIDEEvent laterEvent = new TestEvent(later);
-
-        List<IIDEEvent> events = new ArrayList<>();
-        events.add(buildEvent);
-        events.add(laterEvent);
-
         String expected = "10.0";
 
         // when
-        aggregator.aggregateValue(events, buildEvent);
-        String actual = aggregator.aggregateValue(events, laterEvent);
+        aggregator.aggregateValue(buildEvent);
+        Map<String, String> result = aggregator.aggregateValue(laterEvent);
 
         // then
-        assertEquals(expected, actual);
+        assertEquals(expected, result.get(LastBuildAggregator.TITLE));
     }
 
     @Test
@@ -108,17 +114,13 @@ public class LastBuildAggregatorTest {
 
         IIDEEvent laterEvent = new TestEvent(later);
 
-        List<IIDEEvent> events = new ArrayList<>();
-        events.add(buildEvent);
-        events.add(laterEvent);
-
         String expected = "0.0";
 
         // when
-        aggregator.aggregateValue(events, buildEvent);
-        String actual = aggregator.aggregateValue(events, laterEvent);
+        aggregator.aggregateValue(buildEvent);
+        Map<String, String> actual = aggregator.aggregateValue(laterEvent);
 
         // then
-        assertEquals(expected, actual);
+        assertEquals(expected, actual.get(LastBuildAggregator.TITLE));
     }
 }

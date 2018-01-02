@@ -29,18 +29,17 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class ArffWriter implements Closeable{
-    static final String ARFF = ".arff";
-    static final String RELATION_KEY = "@RELATION";
-    static final String ATTRIBUTE_KEY = "@ATTRIBUTE";
-    static final String NUMERIC_KEY = "NUMERIC";
-    static final String DATA_KEY = "@DATA";
+    private static final String ARFF = ".arff";
+    private static final String RELATION_KEY = "@RELATION";
+    private static final String ATTRIBUTE_KEY = "@ATTRIBUTE";
+    private static final String NUMERIC_KEY = "NUMERIC";
+    private static final String DATA_KEY = "@DATA";
 
     private Set<Aggregator> aggregators;
     private String fileName;
     private BufferedWriter writer;
-    private int counter = 0;
 
-    public ArffWriter(TreeSet<Aggregator> aggregators, String fileName) {
+    public ArffWriter(Set<Aggregator> aggregators, String fileName) {
         this.aggregators = aggregators;
         this.fileName = fileName;
         if (!fileName.endsWith(ARFF)) {
@@ -51,48 +50,58 @@ public class ArffWriter implements Closeable{
     void createNewFile() {
         try {
             writer = Files.newBufferedWriter(Paths.get(fileName));
-            writeHeader(fileName.replace(ARFF, ""), writer);
+            writeHeader(fileName.replace(ARFF, ""));
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
     }
 
-    private void writeHeader(String relation, BufferedWriter writer) throws IOException {
-        writeRelation(relation, writer);
-        writeAttributes(writer);
-        writeDataHeader(writer);
+    private void writeHeader(String relation) throws IOException {
+        writeRelation(relation);
+        writeAttributes();
+        writeDataHeader();
     }
 
-    private void writeRelation(String relation, BufferedWriter writer) throws IOException {
+    private void writeRelation(String relation) throws IOException {
         writer.write(RELATION_KEY + " " + relation);
         writer.newLine();
         writer.newLine();
     }
 
-    private void writeAttributes(BufferedWriter writer) throws IOException {
+    private void writeAttributes() throws IOException {
         List<Aggregator> sorted = aggregators.stream()
-                .sorted(Comparator.comparing(Aggregator::getTitle))
+                .sorted(Comparator.comparing(aggregator -> aggregator.getClass().toString()))
                 .collect(Collectors.toList());
 
         for (Aggregator agg : sorted) {
-            writeAttribute(agg, writer);
+            writeAttribute(agg);
         }
         writer.newLine();
     }
 
-    private void writeAttribute(Aggregator aggregator, BufferedWriter writer) throws IOException {
+    private void writeAttribute(Aggregator aggregator) throws IOException {
         if (aggregator instanceof NominalAggregator) {
-            writeNominalAttribute((NominalAggregator) aggregator, writer);
+            writeNominalAttributes((NominalAggregator) aggregator);
         } else {
-            writeNumericalAttribute(aggregator, writer);
+            writeNumericalAttributes(aggregator);
         }
     }
 
-    private void writeNominalAttribute(NominalAggregator aggregator, BufferedWriter writer) throws IOException {
-        String valueString = buildValueString(aggregator);
+    private void writeNominalAttributes(NominalAggregator aggregator) {
+        aggregator.getTitles().stream()
+            .sorted()
+            .forEach(title -> writeNominalAttribute(aggregator, title));
+    }
 
-        writer.write(ATTRIBUTE_KEY + " " + aggregator.getTitle() + " " + valueString);
-        writer.newLine();
+    private void writeNominalAttribute(NominalAggregator aggregator, String title){
+        try {
+            String valueString = buildValueString(aggregator);
+
+            writer.write(ATTRIBUTE_KEY + " " + title + " " + valueString);
+            writer.newLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private String buildValueString(NominalAggregator aggregator) {
@@ -108,12 +117,22 @@ public class ArffWriter implements Closeable{
         return builder.toString();
     }
 
-    private void writeNumericalAttribute(Aggregator aggregator, BufferedWriter writer) throws IOException {
-        writer.write(ATTRIBUTE_KEY + " " + aggregator.getTitle() + " " + NUMERIC_KEY);
-        writer.newLine();
+    private void writeNumericalAttributes(Aggregator aggregator) {
+        aggregator.getTitles().stream()
+                .sorted()
+                .forEach(this::writeNumericalAttribute);
     }
 
-    private void writeDataHeader(BufferedWriter writer) throws IOException {
+    private void writeNumericalAttribute(String title) {
+        try {
+            writer.write(ATTRIBUTE_KEY + " " + title + " " + NUMERIC_KEY);
+            writer.newLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void writeDataHeader() throws IOException {
         writer.write(DATA_KEY);
         writer.newLine();
     }
@@ -132,7 +151,7 @@ public class ArffWriter implements Closeable{
     private String buildDataRow(Map<String, String> map) {
         StringBuilder builder = new StringBuilder();
         map.keySet().stream().sorted(Comparator.naturalOrder())
-                .forEach(key -> builder.append(map.get(key) + ","));
+                .forEach(key -> builder.append(map.get(key)).append(","));
 
         builder.deleteCharAt(builder.length() - 1);
         return builder.toString();

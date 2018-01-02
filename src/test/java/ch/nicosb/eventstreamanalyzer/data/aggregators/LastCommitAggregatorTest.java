@@ -26,6 +26,8 @@ import org.junit.Test;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -40,19 +42,30 @@ public class LastCommitAggregatorTest {
     }
 
     @Test
+    public void returnsCorrectTitles() {
+        // given
+        String expected = LastCommitAggregator.TITLE;
+
+        // when
+        Set<String> actual = aggregator.getTitles();
+
+        // then
+        assertEquals(1, actual.size());
+        assertTrue(actual.contains(expected));
+    }
+
+    @Test
     public void whenFirstEventIsGiven_returnsZero() {
         // given
         IIDEEvent event = new TestEvent(ZonedDateTime.now());
-        List<IIDEEvent> events = new ArrayList<>();
-        events.add(event);
 
         String expected = "0.0";
 
         // when
-        String actual = aggregator.aggregateValue(events, event);
+        Map<String, String> result = aggregator.aggregateValue(event);
 
         // then
-        assertEquals(expected, actual);
+        assertEquals(expected, result.get(LastCommitAggregator.TITLE));
     }
 
     @Test
@@ -68,16 +81,14 @@ public class LastCommitAggregatorTest {
         commitEvent.Actions = actions;
         commitEvent.TriggeredAt = ZonedDateTime.now();
 
-        List<IIDEEvent> events = new ArrayList<>();
-        events.add(commitEvent);
-
         String expected = "0.0";
 
         // when
-        String actual = aggregator.aggregateValue(events, commitEvent);
+        Map<String, String> result = aggregator.aggregateValue(commitEvent);
 
         // then
-        assertEquals(expected, actual);
+        assertEquals(1, result.size());
+        assertEquals(expected, result.get(LastCommitAggregator.TITLE));
     }
 
     @Test
@@ -99,18 +110,14 @@ public class LastCommitAggregatorTest {
 
         IIDEEvent laterEvent = new TestEvent(later);
 
-        List<IIDEEvent> events = new ArrayList<>();
-        events.add(commitEvent);
-        events.add(laterEvent);
-
         String expected = "10.0";
 
         // when
-        aggregator.aggregateValue(events, commitEvent);
-        String actual = aggregator.aggregateValue(events, laterEvent);
+        aggregator.aggregateValue(commitEvent);
+        Map<String, String> result = aggregator.aggregateValue(laterEvent);
 
         // then
-        assertEquals("10.0", actual);
+        assertEquals("10.0", result.get(LastCommitAggregator.TITLE));
     }
 
 
@@ -124,18 +131,14 @@ public class LastCommitAggregatorTest {
 
         IIDEEvent laterEvent = new TestEvent(later);
 
-        List<IIDEEvent> events = new ArrayList<>();
-        events.add(event);
-        events.add(laterEvent);
-
         String expected = "10.0";
 
         // when
-        aggregator.aggregateValue(events, event);
-        String actual = aggregator.aggregateValue(events, laterEvent);
+        aggregator.aggregateValue(event);
+        Map<String, String> result = aggregator.aggregateValue(laterEvent);
 
         // then
-        assertEquals(expected, actual);
+        assertEquals(expected, result.get(LastCommitAggregator.TITLE));
     }
 
     @Test
@@ -147,17 +150,13 @@ public class LastCommitAggregatorTest {
 
         IIDEEvent laterEvent = new TestEvent(later);
 
-        List<IIDEEvent> events = new ArrayList<>();
-        events.add(event);
-        events.add(laterEvent);
-
         String expected = "0.0";
 
         // when
-        aggregator.aggregateValue(events, event);
-        String actual = aggregator.aggregateValue(events, laterEvent);
+        aggregator.aggregateValue(event);
+        Map<String, String> result = aggregator.aggregateValue(laterEvent);
 
         // then
-        assertEquals(expected, actual);
+        assertEquals(expected, result.get(LastCommitAggregator.TITLE));
     }
 }

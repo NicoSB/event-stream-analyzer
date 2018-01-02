@@ -20,14 +20,17 @@ import cc.kave.commons.model.events.IIDEEvent;
 import cc.kave.commons.model.events.testrunevents.TestCaseResult;
 import cc.kave.commons.model.events.testrunevents.TestResult;
 import cc.kave.commons.model.events.testrunevents.TestRunEvent;
+import com.sun.corba.se.spi.servicecontext.SendingContextServiceContext;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
+import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 
 public class LastSuccessfulTestWithinAggregatorTest {
@@ -41,63 +44,69 @@ public class LastSuccessfulTestWithinAggregatorTest {
     }
 
     @Test
+    public void returnsCorrectTitles() {
+        // given
+        int seconds2 = SECONDS + 10;
+        aggregator = new LastSuccessfulTestWithinAggregator(SECONDS, seconds2);
+
+        String title1 = String.format("Within%dsOfSuccessfulTest", SECONDS);
+        String title2 = String.format("Within%dsOfSuccessfulTest", seconds2);
+
+        // when
+        Set<String> actual = aggregator.getTitles();
+
+        // then
+        assertEquals(2, actual.size());
+        assertTrue(actual.contains(title1));
+        assertTrue(actual.contains(title2));
+    }
+
+    @Test
     public void whenEventIsSuccessfulTestEvent_returnsT() {
         // given
         TestRunEvent event = createSuccessfulEvent(ZonedDateTime.now());
-
-        String expected = "t";
+        String title = String.format("Within%dsOfSuccessfulTest", SECONDS);
+        String expected = LastSuccessfulTestWithinAggregator.TRUE;
 
         // when
-        String actual = aggregator.aggregateValue(null, event);
+        Map<String, String> result = aggregator.aggregateValue(event);
 
         // then
-        assertEquals(expected, actual);
+        assertEquals(expected, result.get(title));
     }
 
     @Test
     public void whenEventIsNotWithinXSecondsOfSuccessfulTest_returnsF() {
         // given
+        String title = String.format("Within%dsOfSuccessfulTest", SECONDS);
         TestRunEvent event = createSuccessfulEvent(ZonedDateTime.now().minusDays(1));
         TestRunEvent event2 = createUnSuccessfulEvent(ZonedDateTime.now());
 
-        String expected = "f";
+        String expected = LastSuccessfulTestWithinAggregator.FALSE;
 
         // when
-        aggregator.aggregateValue(null, event);
-        String actual = aggregator.aggregateValue(null, event2);
+        aggregator.aggregateValue(event);
+        Map<String, String> result = aggregator.aggregateValue(event2);
 
         // then
-        assertEquals(expected, actual);
+        assertEquals(expected, result.get(title));
     }
 
     @Test
     public void whenEventIsWithinXSecondsOfSuccessfulTest_returnsT() {
         // given
+        String title = String.format("Within%dsOfSuccessfulTest", SECONDS);
         TestRunEvent event = createSuccessfulEvent(ZonedDateTime.now().minusSeconds(1));
         TestRunEvent event2 = createUnSuccessfulEvent(ZonedDateTime.now());
 
         String expected = "t";
 
         // when
-        aggregator.aggregateValue(null, event);
-        String actual = aggregator.aggregateValue(null, event2);
+        aggregator.aggregateValue(event);
+        Map<String, String> result = aggregator.aggregateValue(event2);
 
         // then
-        assertEquals(expected, actual);
-    }
-
-    private void createThrowingEvent(ZonedDateTime now) {
-        IIDEEvent event = new IIDEEvent() {
-            @Override
-            public ZonedDateTime getTriggeredAt() {
-                return now;
-            }
-
-            @Override
-            public ZonedDateTime getTerminatedAt() {
-                return now.plus(null);
-            }
-        };
+        assertEquals(expected, result.get(title));
     }
 
     private TestRunEvent createSuccessfulEvent(ZonedDateTime dateTime) {

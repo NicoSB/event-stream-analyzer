@@ -31,12 +31,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.ZonedDateTime;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class QueueProcessorTest {
+
+    private final static String TITLE = "TITLE";
 
     private final String fileName = "Test.arff";
     private QueueProcessor processor;
@@ -85,13 +87,21 @@ public class QueueProcessorTest {
     }
 
     private Aggregator createAggregator() {
-        return new Aggregator("Test") {
-                @Override
-                public String aggregateValue(List<IIDEEvent> events, IIDEEvent event) {
-                    notified = true;
-                    return "";
-                }
-            };
+        return new Aggregator() {
+            @Override
+            public Map<String, String> aggregateValue(IIDEEvent event) {
+                notified = true;
+                return new HashMap<>();
+            }
+
+            @Override
+            public Set<String> getTitles() {
+                Set<String> titles = new TreeSet<>();
+                titles.add(TITLE);
+
+                return titles;
+            }
+        };
     }
 
     @After

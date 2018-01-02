@@ -42,7 +42,7 @@ public class ArffWriterTest {
     @Before
     public void setUp() {
         fileName = "Test.arff";
-        aggregators = new TreeSet<>(Comparator.comparing(Aggregator::getTitle));
+        aggregators = new TreeSet<>(Comparator.comparing(agg -> agg.getClass().getName()));
         writer = new ArffWriter(aggregators, fileName);
     }
 
@@ -141,7 +141,7 @@ public class ArffWriterTest {
         String expected = "A";
 
         Map<String, String> map = new HashMap<>();
-        map.put(aggregator.getTitle(), aggregator.aggregateValue(null, new TestEvent(ZonedDateTime.now())));
+        map.putAll(aggregator.aggregateValue(new TestEvent(ZonedDateTime.now())));
 
         // when
         writer.createNewFile();
@@ -161,7 +161,7 @@ public class ArffWriterTest {
         String expected = "0.0";
 
         Map<String, String> map = new HashMap<>();
-        map.put(aggregator.getTitle(), aggregator.aggregateValue(null, new TestEvent(ZonedDateTime.now())));
+        map.putAll(aggregator.aggregateValue(new TestEvent(ZonedDateTime.now())));
 
         // when
         writer.createNewFile();
@@ -174,36 +174,6 @@ public class ArffWriterTest {
     }
 
     @Test
-    public void whenMultipleAggregatorsAreGiven_ordersAttributesAlphabetically() throws IOException {
-        // given
-        Aggregator numericalAggregator = createNumericalAggregator();
-        Aggregator nominalAggregator = createNominalAggregator();
-        aggregators.add(nominalAggregator);
-        aggregators.add(numericalAggregator);
-
-        Map<String, String> map = new HashMap<>();
-        map.put(numericalAggregator.getTitle(),
-                numericalAggregator.aggregateValue(null, new TestEvent(ZonedDateTime.now())));
-        map.put(nominalAggregator.getTitle(),
-                nominalAggregator.aggregateValue(null, new TestEvent(ZonedDateTime.now())));
-
-        String expected2 = "@ATTRIBUTE " + NOMINAL_AGGREGATOR_TITLE + " {A,B}";
-        String expected3 = "@ATTRIBUTE " + NUMERICAL_AGGREGATOR_TITLE + " NUMERIC";
-        String expected6 = "A,0.0";
-
-        // when
-        writer.createNewFile();
-        writer.writeData(map);
-        writer.close();
-        List<String> lines = Files.readAllLines(Paths.get(fileName));
-
-        // then
-        assertEquals(expected2, lines.get(2));
-        assertEquals(expected3, lines.get(3));
-        assertEquals(expected6, lines.get(6));
-    }
-
-    @Test
     public void whenMultipleAggregatorsAreGiven_separatesEntriesWithCommas() throws IOException {
         // given
         Aggregator numericalAggregator = createNumericalAggregator();
@@ -212,10 +182,8 @@ public class ArffWriterTest {
         aggregators.add(numericalAggregator);
 
         Map<String, String> map = new HashMap<>();
-        map.put(numericalAggregator.getTitle(),
-                numericalAggregator.aggregateValue(null, new TestEvent(ZonedDateTime.now())));
-        map.put(nominalAggregator.getTitle(),
-                nominalAggregator.aggregateValue(null, new TestEvent(ZonedDateTime.now())));
+        map.putAll(numericalAggregator.aggregateValue(new TestEvent(ZonedDateTime.now())));
+        map.putAll(nominalAggregator.aggregateValue(new TestEvent(ZonedDateTime.now())));
 
         String expected = "A,0.0";
 
@@ -230,19 +198,39 @@ public class ArffWriterTest {
     }
 
     private Aggregator createNumericalAggregator() {
-        return new Aggregator(NUMERICAL_AGGREGATOR_TITLE) {
+        return new Aggregator() {
             @Override
-            public String aggregateValue(List<IIDEEvent> events, IIDEEvent event) {
-                return "0.0";
+            public Map<String, String> aggregateValue(IIDEEvent event) {
+                Map<String, String> map = new HashMap<>();
+                map.put(NUMERICAL_AGGREGATOR_TITLE, "0.0");
+                return map;
+            }
+
+            @Override
+            public Set<String> getTitles() {
+                Set<String> set = new HashSet<>();
+                set.add(NUMERICAL_AGGREGATOR_TITLE);
+
+                return set;
             }
         };
     }
 
     private Aggregator createNominalAggregator() {
-        return new NominalAggregator(NOMINAL_AGGREGATOR_TITLE, "A", "B") {
+        return new NominalAggregator("A", "B") {
             @Override
-            public String aggregateValue(List<IIDEEvent> events, IIDEEvent event) {
-                return "A";
+            public Map<String, String> aggregateValue(IIDEEvent event) {
+                Map<String, String> map = new HashMap<>();
+                map.put(NOMINAL_AGGREGATOR_TITLE, "A");
+
+                return map;
+            }
+
+            @Override
+            public Set<String> getTitles() {
+                Set<String> set = new HashSet<>();
+                set.add(NOMINAL_AGGREGATOR_TITLE);
+                return set;
             }
         };
     }

@@ -16,10 +16,9 @@
 package ch.nicosb.eventstreamanalyzer.data.aggregators;
 
 public abstract class NominalAggregator extends Aggregator {
-    protected String[] possibleValues;
+    String[] possibleValues;
 
-    public NominalAggregator(String title, String... possibleValues) {
-        super(title);
+    public NominalAggregator(String... possibleValues) {
         this.possibleValues = possibleValues;
     }
 

@@ -19,28 +19,38 @@ import cc.kave.commons.model.events.IIDEEvent;
 import cc.kave.commons.model.events.visualstudio.BuildEvent;
 import ch.nicosb.eventstreamanalyzer.utils.EventUtils;
 
-import java.util.List;
+import java.util.*;
 
 public class LastBuildAggregator extends Aggregator{
-    public static final String TITLE = "SecsSinceLastBuild";
-    private int timeout;
+    static final String TITLE = "SecsSinceLastBuild";
 
+    private Set<String> titles;
+    private int timeout;
     private double activeTimeSinceLastBuild = 0;
     private long lastEventEnd = -1;
 
     public LastBuildAggregator(int timeout) {
-        super(TITLE);
         this.timeout = timeout;
+        titles = new HashSet<>();
+        titles.add(TITLE);
     }
 
     @Override
-    public String aggregateValue(List<IIDEEvent> events, IIDEEvent event) {
+    public Map<String, String> aggregateValue(IIDEEvent event) {
+        Map<String, String> map = new HashMap<>();
+
         if (event instanceof BuildEvent || lastEventEnd == -1) {
-            lastEventEnd = EventUtils.getEnd(event).toEpochSecond();
-            activeTimeSinceLastBuild = 0;
-            return String.valueOf(activeTimeSinceLastBuild);
+            setActiveTimeToZero(event);
+        } else {
+            calculateActiveTime(event);
         }
 
+        map.put(TITLE, String.valueOf(activeTimeSinceLastBuild));
+
+        return map;
+    }
+
+    private void calculateActiveTime(IIDEEvent event) {
         long eventStart = event.getTriggeredAt().toEpochSecond();
         long eventEnd = EventUtils.getEnd(event).toEpochSecond();
 
@@ -51,7 +61,15 @@ public class LastBuildAggregator extends Aggregator{
         }
 
         lastEventEnd = eventEnd;
+    }
 
-        return String.valueOf(activeTimeSinceLastBuild);
+    private void setActiveTimeToZero(IIDEEvent event) {
+        lastEventEnd = EventUtils.getEnd(event).toEpochSecond();
+        activeTimeSinceLastBuild = 0;
+    }
+
+    @Override
+    public Set<String> getTitles() {
+        return titles;
     }
 }
