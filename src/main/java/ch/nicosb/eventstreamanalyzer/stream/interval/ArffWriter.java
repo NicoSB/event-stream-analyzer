@@ -22,9 +22,7 @@ import java.io.BufferedWriter;
 import java.io.Closeable;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.OpenOption;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -79,7 +77,7 @@ public class ArffWriter implements Closeable{
         writer.newLine();
     }
 
-    private void writeAttribute(Aggregator aggregator) throws IOException {
+    private void writeAttribute(Aggregator aggregator) {
         if (aggregator instanceof NominalAggregator) {
             writeNominalAttributes((NominalAggregator) aggregator);
         } else {
@@ -137,7 +135,7 @@ public class ArffWriter implements Closeable{
         writer.newLine();
     }
 
-    public void writeData(Map<String, String> map) throws IOException {
+    public void writeData(Map<String, String> map) {
         try {
             String dataRow = buildDataRow(map);
 

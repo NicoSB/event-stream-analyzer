@@ -15,21 +15,11 @@
  */
 package ch.nicosb.eventstreamanalyzer.parser;
 
-import cc.kave.commons.model.events.IIDEEvent;
-import cc.kave.commons.model.events.visualstudio.IDEStateEvent;
-import cc.kave.commons.model.events.visualstudio.WindowEvent;
-import ch.nicosb.eventstreamanalyzer.stream.EventStream;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

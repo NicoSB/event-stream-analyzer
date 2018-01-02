@@ -18,7 +18,6 @@ package ch.nicosb.eventstreamanalyzer.stream;
 import cc.kave.commons.model.events.IIDEEvent;
 
 import java.util.List;
-import java.util.TreeSet;
 
 public class EventStream {
     private List<IIDEEvent> events;

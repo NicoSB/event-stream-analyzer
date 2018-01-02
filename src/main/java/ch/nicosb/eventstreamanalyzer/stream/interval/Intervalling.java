@@ -15,19 +15,12 @@
  */
 package ch.nicosb.eventstreamanalyzer.stream.interval;
 
-import cc.kave.commons.model.events.visualstudio.BuildEvent;
 import ch.nicosb.eventstreamanalyzer.Execution;
-import ch.nicosb.eventstreamanalyzer.data.*;
 import ch.nicosb.eventstreamanalyzer.data.aggregators.*;
-import ch.nicosb.eventstreamanalyzer.data.aggregators.entryaggregators.*;
 import ch.nicosb.eventstreamanalyzer.parser.ListeningEventQueue;
 import ch.nicosb.eventstreamanalyzer.parser.NotifyingZipParser;
 import ch.nicosb.eventstreamanalyzer.parser.ZipUtils;
-import ch.nicosb.eventstreamanalyzer.stream.EventStream;
-import ch.nicosb.eventstreamanalyzer.stream.Session;
-import ch.nicosb.eventstreamanalyzer.stream.Sessionizer;
 import ch.nicosb.eventstreamanalyzer.utils.PeriodicLogger;
-import ch.nicosb.eventstreamanalyzer.weka.MapToArffConverter;
 
 import java.io.IOException;
 import java.nio.file.Path;

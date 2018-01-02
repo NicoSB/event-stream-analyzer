@@ -15,7 +15,6 @@
  */
 package ch.nicosb.eventstreamanalyzer.data;
 
-import cc.kave.commons.model.events.IDEEvent;
 import cc.kave.commons.model.events.IIDEEvent;
 
 import java.time.ZonedDateTime;

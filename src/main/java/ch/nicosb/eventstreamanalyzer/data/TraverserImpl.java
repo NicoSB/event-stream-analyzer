@@ -21,7 +21,6 @@ import ch.nicosb.eventstreamanalyzer.data.aggregators.Aggregator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class TraverserImpl extends Traverser {
     private List<Entry> entries;

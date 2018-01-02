@@ -15,12 +15,9 @@
  */
 package ch.nicosb.eventstreamanalyzer.data.aggregators;
 
-import cc.kave.commons.model.events.IDEEvent;
-import cc.kave.commons.model.events.IIDEEvent;
 import cc.kave.commons.model.events.testrunevents.TestCaseResult;
 import cc.kave.commons.model.events.testrunevents.TestResult;
 import cc.kave.commons.model.events.testrunevents.TestRunEvent;
-import com.sun.corba.se.spi.servicecontext.SendingContextServiceContext;
 import org.junit.Before;
 import org.junit.Test;
 

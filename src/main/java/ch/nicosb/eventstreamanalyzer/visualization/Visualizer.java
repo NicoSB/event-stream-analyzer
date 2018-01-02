@@ -21,7 +21,6 @@ import java.util.List;
 
 public class Visualizer {
     private ImageDrawer drawer;
-    private List<CompactEvent> events;
 
     public Visualizer(List<CompactEvent> events, ImageDrawer drawer) {
         this.drawer = drawer;

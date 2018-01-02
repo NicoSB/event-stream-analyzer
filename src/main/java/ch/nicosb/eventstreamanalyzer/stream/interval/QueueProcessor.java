@@ -55,11 +55,7 @@ public class QueueProcessor implements Runnable, StatusProvider {
     @Override
     public void run() {
         while(isRunning()) {
-            try {
-                processNextEvent();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            processNextEvent();
         }
 
         try {
@@ -69,7 +65,7 @@ public class QueueProcessor implements Runnable, StatusProvider {
         }
     }
 
-    private synchronized void processNextEvent() throws IOException {
+    private synchronized void processNextEvent() {
         if (queue.size() > 0) {
             IIDEEvent event = queue.poll();
             if (event != null)
@@ -88,13 +84,8 @@ public class QueueProcessor implements Runnable, StatusProvider {
     }
 
     private void tryMapWrite(Map<String, String> map) {
-        try {
-            arffWriter.writeData(map);
-            counter++;
-        } catch (IOException e) {
-            e.printStackTrace();
-            failures++;
-        }
+        arffWriter.writeData(map);
+        counter++;
     }
 
     private boolean isRunning() {
