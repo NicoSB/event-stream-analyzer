@@ -35,7 +35,7 @@ import static org.mockito.Mockito.when;
 public class LastBuildAggregatorTest {
 
     private LastBuildAggregator aggregator;
-    private ZonedDateTime now;
+    private ZonedDateTime buildTime;
     private int timeout = 10;
 
     @Mock
@@ -45,8 +45,8 @@ public class LastBuildAggregatorTest {
     public void setUp() throws Exception {
         this.aggregator = new LastBuildAggregator(10);
 
-        now = ZonedDateTime.now();
-        when(buildEvent.getTriggeredAt()).thenReturn(now);
+        buildTime = ZonedDateTime.now();
+        when(buildEvent.getTriggeredAt()).thenReturn(buildTime);
     }
 
     @Test
@@ -83,7 +83,7 @@ public class LastBuildAggregatorTest {
     @Test
     public void whenEventsAreWithinTimeOut_doesAddDifference() {
         // given
-        ZonedDateTime later = now.plusSeconds(timeout);
+        ZonedDateTime later = buildTime.plusSeconds(timeout);
 
         IIDEEvent laterEvent = new TestEvent(later);
 
@@ -104,7 +104,7 @@ public class LastBuildAggregatorTest {
     @Test
     public void whenEventsAreNotWithinTimeOut_doesNotAddDifference() {
         // given
-        ZonedDateTime later = now.plusSeconds(timeout + 1);
+        ZonedDateTime later = buildTime.plusSeconds(timeout + 1);
 
         IIDEEvent laterEvent = new TestEvent(later);
 
