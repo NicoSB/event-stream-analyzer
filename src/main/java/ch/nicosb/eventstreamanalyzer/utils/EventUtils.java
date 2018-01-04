@@ -19,7 +19,12 @@ import cc.kave.commons.model.events.IIDEEvent;
 import cc.kave.commons.model.events.versioncontrolevents.VersionControlAction;
 import cc.kave.commons.model.events.versioncontrolevents.VersionControlActionType;
 import cc.kave.commons.model.events.versioncontrolevents.VersionControlEvent;
+import cc.kave.commons.model.events.visualstudio.BuildEvent;
+import cc.kave.commons.model.events.visualstudio.BuildTarget;
+import cc.kave.commons.model.events.visualstudio.DocumentAction;
+import cc.kave.commons.model.events.visualstudio.DocumentEvent;
 
+import javax.print.Doc;
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -47,5 +52,26 @@ public class EventUtils {
         } catch (Exception e) {
             return event.getTriggeredAt();
         }
+    }
+
+    public static boolean isSuccessfulBuildEvent(IIDEEvent event) {
+        if (!(event instanceof BuildEvent) || ((BuildEvent) event).Targets.isEmpty())
+            return false;
+
+        for(BuildTarget target : ((BuildEvent) event).Targets) {
+            if (!target.Successful)
+                return false;
+        }
+
+        return true;
+    }
+
+    public static boolean isFileCloseEvent(IIDEEvent event) {
+        if (!(event instanceof DocumentEvent))
+            return false;
+
+        DocumentEvent documentEvent = (DocumentEvent) event;
+
+        return documentEvent.Action == DocumentAction.Closing;
     }
 }

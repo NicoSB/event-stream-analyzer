@@ -185,7 +185,7 @@ public class ArffWriterTest {
         map.putAll(numericalAggregator.aggregateValue(new TestEvent(ZonedDateTime.now())));
         map.putAll(nominalAggregator.aggregateValue(new TestEvent(ZonedDateTime.now())));
 
-        String expected = "A,0.0";
+        String expected = "0.0,A";
 
         // when
         writer.createNewFile();

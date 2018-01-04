@@ -23,6 +23,8 @@ import org.junit.Test;
 
 import java.time.ZonedDateTime;
 
+import static org.junit.Assert.assertEquals;
+
 public class IntervalEventWindowTest {
 
     private IntervalEventWindow window;
@@ -42,8 +44,8 @@ public class IntervalEventWindowTest {
         window.add(event);
 
         // then
-        Assert.assertEquals(1, window.size());
-        Assert.assertEquals(event, window.get(0));
+        assertEquals(1, window.size());
+        assertEquals(event, window.get(0));
     }
 
     @Test
@@ -57,8 +59,8 @@ public class IntervalEventWindowTest {
         window.add(event);
 
         // then
-        Assert.assertEquals(1, window.size());
-        Assert.assertEquals(event, window.get(0));
+        assertEquals(1, window.size());
+        assertEquals(event, window.get(0));
     }
 
     @Test
@@ -72,7 +74,7 @@ public class IntervalEventWindowTest {
         window.add(event);
 
         // then
-        Assert.assertEquals(2, window.size());
+        assertEquals(2, window.size());
     }
 
     @Test
@@ -86,7 +88,35 @@ public class IntervalEventWindowTest {
         window.add(second);
 
         // then
-        Assert.assertEquals(first, window.get(0));
-        Assert.assertEquals(second, window.get(1));
+        assertEquals(first, window.get(0));
+        assertEquals(second, window.get(1));
+    }
+
+    @Test
+    public void whenWindowEndIsSet_RemovesOldEvents() {
+        // given
+        ZonedDateTime now = ZonedDateTime.now();
+        IIDEEvent event = new TestEvent(now);
+
+        // when
+        window.add(event);
+        window.setWindowEnd(now.plusSeconds(INTERVAL + 1));
+
+        // then
+        assertEquals(0, window.size());
+    }
+    @Test
+
+    public void whenWindowEndIsSet_DoesNotRemoveEventsWithinWindow() {
+        // given
+        ZonedDateTime now = ZonedDateTime.now();
+        IIDEEvent event = new TestEvent(now);
+
+        // when
+        window.add(event);
+        window.setWindowEnd(now.plusSeconds(INTERVAL - 1));
+
+        // then
+        assertEquals(1, window.size());
     }
 }

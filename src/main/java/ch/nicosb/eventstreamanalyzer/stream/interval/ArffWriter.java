@@ -18,6 +18,7 @@ package ch.nicosb.eventstreamanalyzer.stream.interval;
 import ch.nicosb.eventstreamanalyzer.data.aggregators.Aggregator;
 import ch.nicosb.eventstreamanalyzer.data.aggregators.NominalAggregator;
 
+import javax.swing.event.DocumentEvent;
 import java.io.BufferedWriter;
 import java.io.Closeable;
 import java.io.IOException;
@@ -36,10 +37,13 @@ public class ArffWriter implements Closeable{
     private Set<Aggregator> aggregators;
     private String fileName;
     private BufferedWriter writer;
+    private List<String> keys;
 
     public ArffWriter(Set<Aggregator> aggregators, String fileName) {
         this.aggregators = aggregators;
         this.fileName = fileName;
+        keys = new ArrayList<>();
+
         if (!fileName.endsWith(ARFF)) {
             this.fileName = fileName + ARFF;
         }
@@ -67,17 +71,18 @@ public class ArffWriter implements Closeable{
     }
 
     private void writeAttributes() throws IOException {
+
         List<Aggregator> sorted = aggregators.stream()
                 .sorted(Comparator.comparing(aggregator -> aggregator.getClass().toString()))
                 .collect(Collectors.toList());
 
         for (Aggregator agg : sorted) {
-            writeAttribute(agg);
+            writeAttributes(agg);
         }
         writer.newLine();
     }
 
-    private void writeAttribute(Aggregator aggregator) {
+    private void writeAttributes(Aggregator aggregator) {
         if (aggregator instanceof NominalAggregator) {
             writeNominalAttributes((NominalAggregator) aggregator);
         } else {
@@ -97,6 +102,8 @@ public class ArffWriter implements Closeable{
 
             writer.write(ATTRIBUTE_KEY + " " + title + " " + valueString);
             writer.newLine();
+
+            keys.add(title);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -125,6 +132,7 @@ public class ArffWriter implements Closeable{
         try {
             writer.write(ATTRIBUTE_KEY + " " + title + " " + NUMERIC_KEY);
             writer.newLine();
+            keys.add(title);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -148,9 +156,7 @@ public class ArffWriter implements Closeable{
 
     private String buildDataRow(Map<String, String> map) {
         StringBuilder builder = new StringBuilder();
-        map.keySet().stream().sorted(Comparator.naturalOrder())
-                .forEach(key -> builder.append(map.get(key)).append(","));
-
+        keys.forEach(key -> builder.append(map.get(key)).append(","));
         builder.deleteCharAt(builder.length() - 1);
         return builder.toString();
     }

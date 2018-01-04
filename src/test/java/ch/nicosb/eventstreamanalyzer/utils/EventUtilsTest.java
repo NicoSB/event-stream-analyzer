@@ -19,6 +19,10 @@ import cc.kave.commons.model.events.IIDEEvent;
 import cc.kave.commons.model.events.versioncontrolevents.VersionControlAction;
 import cc.kave.commons.model.events.versioncontrolevents.VersionControlActionType;
 import cc.kave.commons.model.events.versioncontrolevents.VersionControlEvent;
+import cc.kave.commons.model.events.visualstudio.BuildEvent;
+import cc.kave.commons.model.events.visualstudio.BuildTarget;
+import cc.kave.commons.model.events.visualstudio.DocumentAction;
+import cc.kave.commons.model.events.visualstudio.DocumentEvent;
 import ch.nicosb.eventstreamanalyzer.testutils.TestEvent;
 import org.junit.Test;
 
@@ -144,5 +148,105 @@ public class EventUtilsTest {
                 return null;
             }
         };
+    }
+
+    @Test
+    public void whenIsNotABuildEvent_returnsFalse() {
+        // given
+        IIDEEvent event = new TestEvent(ZonedDateTime.now());
+
+        // when
+        boolean actual = EventUtils.isSuccessfulBuildEvent(event);
+
+        // then
+        assertFalse(actual);
+    }
+
+    @Test
+    public void whenNotAllTargetsWereSuccessful_returnsFalse() {
+        // given
+        BuildEvent event = new BuildEvent();
+        event.Targets = new ArrayList<>();
+        BuildTarget successful = new BuildTarget();
+        successful.Successful = true;
+        BuildTarget failed = new BuildTarget();
+        failed.Successful = false;
+
+        event.Targets.add(successful);
+        event.Targets.add(failed);
+
+        // when
+        boolean actual = EventUtils.isSuccessfulBuildEvent(event);
+
+        // then
+        assertFalse(actual);
+    }
+
+    @Test
+    public void whenAllTargetsWereSuccessful_returnsTrue() {
+        // given
+        BuildEvent event = new BuildEvent();
+        event.Targets = new ArrayList<>();
+
+        BuildTarget successful = new BuildTarget();
+        successful.Successful = true;
+        event.Targets.add(successful);
+
+        // when
+        boolean actual = EventUtils.isSuccessfulBuildEvent(event);
+
+        // then
+        assertTrue(actual);
+    }
+
+    @Test
+    public void whenNoTargetsAreAvailable_returnsFalse() {
+        // given
+        BuildEvent event = new BuildEvent();
+        event.Targets = new ArrayList<>();
+
+        // when
+        boolean actual = EventUtils.isSuccessfulBuildEvent(event);
+
+        // then
+        assertFalse(actual);
+    }
+
+    @Test
+    public void whenIsFileCloseEvent_returnsTrue() {
+        // given
+        DocumentEvent event = new DocumentEvent();
+        event.Action = DocumentAction.Closing;
+
+        // when
+        boolean actual = EventUtils.isFileCloseEvent(event);
+
+        // then
+        assertTrue(actual);
+    }
+
+    @Test
+    public void whenIsNotAFileCloseEvent_returnsTrue() {
+        // given
+        DocumentEvent event = new DocumentEvent();
+        event.Action = DocumentAction.Opened;
+
+        // when
+        boolean actual = EventUtils.isFileCloseEvent(event);
+
+        // then
+        assertFalse(actual);
+    }
+
+    @Test
+    public void whenIsNotADocumentEvent_returnsFalse() {
+        // given
+        IIDEEvent event = new TestEvent(ZonedDateTime.now());
+
+        // when
+        boolean actual = EventUtils.isFileCloseEvent(event);
+
+        // then
+        assertFalse(actual);
     }
 }

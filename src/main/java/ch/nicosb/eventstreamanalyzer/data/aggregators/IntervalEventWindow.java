@@ -39,6 +39,10 @@ public class IntervalEventWindow {
         IIDEEvent last = events.last();
         ZonedDateTime minTime = EventUtils.getEnd(last).minusSeconds(intervalInSeconds);
 
+        removeEventsBefore(minTime);
+    }
+
+    private void removeEventsBefore(ZonedDateTime minTime) {
         for (Iterator<IIDEEvent> iterator = events.iterator(); iterator.hasNext();) {
             IIDEEvent event = iterator.next();
             if (event.getTriggeredAt().isAfter(minTime))
@@ -58,5 +62,10 @@ public class IntervalEventWindow {
             it.next();
         }
         return (IIDEEvent) it.next();
+    }
+
+    public void setWindowEnd(ZonedDateTime end) {
+        ZonedDateTime windowStart = end.minusSeconds(intervalInSeconds);
+        removeEventsBefore(windowStart);
     }
 }

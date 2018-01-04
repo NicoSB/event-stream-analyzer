@@ -68,21 +68,29 @@ public class Intervalling implements Execution {
     }
 
     private void registerAggregators() {
+        int thirtySeconds = 30;
         int fiveMinutes = 5*60;
+        int twoMinutes = 2*60;
+
         Aggregator eventCountAggregator = new EventCountAggregator(fiveMinutes);
         processor.registerAggregator(eventCountAggregator);
 
-        int twoMinutes = 2*60;
         Aggregator timeSinceLastBuildAggregator = new LastBuildAggregator(twoMinutes);
         processor.registerAggregator(timeSinceLastBuildAggregator);
 
         Aggregator timeSinceLastCommitAggregator = new LastCommitAggregator(twoMinutes);
         processor.registerAggregator(timeSinceLastCommitAggregator);
 
-        Aggregator lastSuccessfulTestWithinAggregator = new LastSuccessfulTestWithinAggregator(twoMinutes);
+        Aggregator lastSuccessfulTestWithinAggregator = new LastSuccessfulTestWithinAggregator(thirtySeconds, twoMinutes, fiveMinutes);
         processor.registerAggregator(lastSuccessfulTestWithinAggregator);
 
         Aggregator isCommitEventAggregator = new IsCommitEventAggregator();
         processor.registerAggregator(isCommitEventAggregator);
+
+        Aggregator lastSuccessfulBuildWithinAggregator = new LastBuildWithinAggregator(thirtySeconds, twoMinutes, fiveMinutes);
+        processor.registerAggregator(lastSuccessfulBuildWithinAggregator);
+
+        Aggregator fileCloseCountAggregator = new FileCloseCountWithinAggregator(thirtySeconds, twoMinutes, fiveMinutes);
+        processor.registerAggregator(fileCloseCountAggregator);
     }
 }
