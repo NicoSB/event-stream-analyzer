@@ -54,7 +54,8 @@ public class ArffWriter implements Closeable{
             writer = Files.newBufferedWriter(Paths.get(fileName));
             writeHeader(fileName.replace(ARFF, ""));
         } catch (IOException ioe) {
-            ioe.printStackTrace();
+            fileName = fileName + "(1)";
+            createNewFile();
         }
     }
 

@@ -219,7 +219,7 @@ public class EventUtilsTest {
         event.Action = DocumentAction.Closing;
 
         // when
-        boolean actual = EventUtils.isFileCloseEvent(event);
+        boolean actual = EventUtils.isFileClosingEvent(event);
 
         // then
         assertTrue(actual);
@@ -232,7 +232,7 @@ public class EventUtilsTest {
         event.Action = DocumentAction.Opened;
 
         // when
-        boolean actual = EventUtils.isFileCloseEvent(event);
+        boolean actual = EventUtils.isFileClosingEvent(event);
 
         // then
         assertFalse(actual);
@@ -244,7 +244,37 @@ public class EventUtilsTest {
         IIDEEvent event = new TestEvent(ZonedDateTime.now());
 
         // when
-        boolean actual = EventUtils.isFileCloseEvent(event);
+        boolean actual = EventUtils.isFileActionEvent(event, DocumentAction.Closing);
+
+        // then
+        assertFalse(actual);
+    }
+
+    @Test
+    public void whenDocumentActionMatches_returnsTrue() {
+        // given
+        DocumentAction save = DocumentAction.Saved;
+
+        DocumentEvent event = new DocumentEvent();
+        event.Action = save;
+
+        // when
+        boolean actual = EventUtils.isFileActionEvent(event, save);
+
+        // then
+        assertTrue(actual);
+    }
+
+    @Test
+    public void whenDocumentActionDoesNotMatch_returnsFalse() {
+        // given
+        DocumentAction save = DocumentAction.Saved;
+
+        DocumentEvent event = new DocumentEvent();
+        event.Action = DocumentAction.Closing;
+
+        // when
+        boolean actual = EventUtils.isFileActionEvent(event, save);
 
         // then
         assertFalse(actual);

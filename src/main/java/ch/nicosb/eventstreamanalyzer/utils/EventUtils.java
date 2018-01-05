@@ -66,12 +66,16 @@ public class EventUtils {
         return true;
     }
 
-    public static boolean isFileCloseEvent(IIDEEvent event) {
+    public static boolean isFileClosingEvent(IIDEEvent event) {
+        return isFileActionEvent(event, DocumentAction.Closing);
+    }
+
+    public static boolean isFileActionEvent(IIDEEvent event, DocumentAction action) {
         if (!(event instanceof DocumentEvent))
             return false;
 
         DocumentEvent documentEvent = (DocumentEvent) event;
 
-        return documentEvent.Action == DocumentAction.Closing;
+        return documentEvent.Action == action;
     }
 }

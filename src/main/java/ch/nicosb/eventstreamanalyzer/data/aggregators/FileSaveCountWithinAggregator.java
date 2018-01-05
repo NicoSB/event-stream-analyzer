@@ -16,19 +16,23 @@
 package ch.nicosb.eventstreamanalyzer.data.aggregators;
 
 import cc.kave.commons.model.events.IIDEEvent;
+import cc.kave.commons.model.events.visualstudio.DocumentAction;
 import ch.nicosb.eventstreamanalyzer.utils.EventUtils;
 
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-public class FileCloseCountWithinAggregator extends Aggregator {
+public class FileSaveCountWithinAggregator extends Aggregator {
 
-    final static String TITLE_BLUEPRINT = "FilesClosedInLast%ds";
+    final static String TITLE_BLUEPRINT = "FilesSavedInLast%ds";
     private Set<Integer> windows;
     private Map<Integer, IntervalEventWindow> intervalWindows;
 
-    public FileCloseCountWithinAggregator(int... seconds) {
+    public FileSaveCountWithinAggregator(int... seconds) {
         windows = new TreeSet<>();
         intervalWindows = new HashMap<>();
         init(seconds);
@@ -43,7 +47,7 @@ public class FileCloseCountWithinAggregator extends Aggregator {
 
     @Override
     public Map<String, String> aggregateValue(IIDEEvent event) {
-        if (EventUtils.isFileClosingEvent(event)) {
+        if (EventUtils.isFileActionEvent(event, DocumentAction.Saved)) {
             windows.forEach(window -> intervalWindows.get(window).add(event));
         } else {
             ZonedDateTime end = EventUtils.getEnd(event);

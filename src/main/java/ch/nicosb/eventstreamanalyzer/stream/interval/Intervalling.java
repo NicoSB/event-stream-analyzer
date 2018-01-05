@@ -92,5 +92,8 @@ public class Intervalling implements Execution {
 
         Aggregator fileCloseCountAggregator = new FileCloseCountWithinAggregator(thirtySeconds, twoMinutes, fiveMinutes);
         processor.registerAggregator(fileCloseCountAggregator);
+
+        Aggregator fileSaveCountAggregator = new FileSaveCountWithinAggregator(thirtySeconds, twoMinutes, fiveMinutes);
+        processor.registerAggregator(fileSaveCountAggregator);
     }
 }
