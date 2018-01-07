@@ -17,6 +17,8 @@ package ch.nicosb.eventstreamanalyzer.stream.interval;
 
 import cc.kave.commons.model.events.IIDEEvent;
 import ch.nicosb.eventstreamanalyzer.data.aggregators.Aggregator;
+import ch.nicosb.eventstreamanalyzer.data.sampling.IntervalPicker;
+import ch.nicosb.eventstreamanalyzer.data.sampling.SamplePicker;
 import ch.nicosb.eventstreamanalyzer.parser.ListeningEventQueue;
 import ch.nicosb.eventstreamanalyzer.stream.util.StatusProvider;
 
@@ -24,19 +26,21 @@ import java.io.IOException;
 import java.util.*;
 
 public class QueueProcessor implements Runnable, StatusProvider {
-    private final String fileName;
     private Set<Aggregator> aggregators = new HashSet<>();
     private ArffWriter arffWriter;
+    private SamplePicker samplePicker;
     private ListeningEventQueue queue;
     private boolean cancelled;
-    private int counter = 0;
-    private int failures = 0;
+    private int eventsWritten = 0;
+    private int eventsSkipped = 0;
 
-    public QueueProcessor(ListeningEventQueue queue) {
+    public QueueProcessor(ListeningEventQueue queue, int interval) {
         cancelled = false;
-        this.fileName = queue.getTitle();
+        String fileName = queue.getTitle();
         this.queue = queue;
         arffWriter = new ArffWriter(aggregators, fileName);
+
+        samplePicker = new IntervalPicker(interval);
     }
 
     public void start() {
@@ -75,17 +79,30 @@ public class QueueProcessor implements Runnable, StatusProvider {
 
     private void tryExtractAndWriteValues(IIDEEvent event) {
         try {
-            Map<String, String> combinedMap = new HashMap<>();
-            aggregators.forEach(aggregator -> combinedMap.putAll(aggregator.aggregateValue(event)));
-            tryMapWrite(combinedMap);
+            Map<String, String> combinedMap = extractValues(event);
+            if (shouldSample(event)) {
+                tryMapWrite(combinedMap);
+            } else {
+                eventsSkipped++;
+            }
         } catch (Exception e) {
             System.err.println("Failed to write event: " + event.toString());
         }
     }
 
+    private Map<String, String> extractValues(IIDEEvent event) {
+        Map<String, String> combinedMap = new HashMap<>();
+        aggregators.forEach(aggregator -> combinedMap.putAll(aggregator.aggregateValue(event)));
+        return combinedMap;
+    }
+
+    private boolean shouldSample(IIDEEvent event) {
+        return samplePicker.shouldSample(event);
+    }
+
     private void tryMapWrite(Map<String, String> map) {
         arffWriter.writeData(map);
-        counter++;
+        eventsWritten++;
     }
 
     private boolean isRunning() {
@@ -94,6 +111,6 @@ public class QueueProcessor implements Runnable, StatusProvider {
 
     @Override
     public String getStatus() {
-        return String.format("%d Events written. %d errors.", counter, failures);
+        return String.format("%d Events written. %d Events skipped.", eventsWritten, eventsSkipped);
     }
 }

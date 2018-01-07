@@ -26,7 +26,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-public class FileSaveCountWithinAggregator extends Aggregator {
+public class FileSaveCountWithinAggregator implements Aggregator {
 
     final static String TITLE_BLUEPRINT = "FilesSavedInLast%ds";
     private Set<Integer> windows;

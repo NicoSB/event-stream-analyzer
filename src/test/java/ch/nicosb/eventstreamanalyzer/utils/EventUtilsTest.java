@@ -279,4 +279,71 @@ public class EventUtilsTest {
         // then
         assertFalse(actual);
     }
+
+    @Test
+    public void whenVcEventOfTypeExists_returnsExecutedAtTime() {
+        // given
+        VersionControlEvent event = new VersionControlEvent();
+        event.Actions = new ArrayList<>();
+
+        VersionControlAction action = new VersionControlAction();
+        action.ExecutedAt = ZonedDateTime.now();
+        action.ActionType = VersionControlActionType.Commit;
+
+        event.Actions.add(action);
+
+        ZonedDateTime expected = action.ExecutedAt;
+
+        // when
+        ZonedDateTime actual = EventUtils.getVersionControlActionDate(event, VersionControlActionType.Commit);
+
+        // then
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void whenMultipleEventsExist_returnsLastExecutedAtTime() {
+        // given
+        VersionControlEvent event = new VersionControlEvent();
+        event.Actions = new ArrayList<>();
+
+        VersionControlAction action = new VersionControlAction();
+        action.ExecutedAt = ZonedDateTime.now();
+        action.ActionType = VersionControlActionType.Commit;
+
+        VersionControlAction laterAction = new VersionControlAction();
+        laterAction.ExecutedAt = action.ExecutedAt.plusSeconds(1);
+        laterAction.ActionType = VersionControlActionType.Commit;
+
+        event.Actions.add(action);
+        event.Actions.add(laterAction);
+
+        ZonedDateTime expected = laterAction.ExecutedAt;
+
+        // when
+        ZonedDateTime actual = EventUtils.getVersionControlActionDate(event, VersionControlActionType.Commit);
+
+        // then
+        assertEquals(expected, actual);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void whenNoVcEventOfTypeExists_throws() {
+        // given
+        VersionControlEvent event = new VersionControlEvent();
+        event.Actions = new ArrayList<>();
+
+        VersionControlAction action = new VersionControlAction();
+        action.ExecutedAt = ZonedDateTime.now();
+        action.ActionType = VersionControlActionType.Rebase;
+
+        event.Actions.add(action);
+
+        ZonedDateTime expected = action.ExecutedAt;
+
+        // when
+        ZonedDateTime actual = EventUtils.getVersionControlActionDate(event, VersionControlActionType.Commit);
+
+        // then throws
+    }
 }

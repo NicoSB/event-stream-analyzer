@@ -20,7 +20,7 @@ import cc.kave.commons.model.events.IIDEEvent;
 import java.util.Map;
 import java.util.Set;
 
-public abstract class Aggregator {
-    public abstract Map<String, String> aggregateValue(IIDEEvent event);
-    public abstract Set<String> getTitles();
+public interface Aggregator {
+    Map<String, String> aggregateValue(IIDEEvent event);
+    Set<String> getTitles();
 }

@@ -26,7 +26,9 @@ import cc.kave.commons.model.events.visualstudio.DocumentEvent;
 
 import javax.print.Doc;
 import java.time.ZonedDateTime;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 public class EventUtils {
 
@@ -77,5 +79,15 @@ public class EventUtils {
         DocumentEvent documentEvent = (DocumentEvent) event;
 
         return documentEvent.Action == action;
+    }
+
+    public static ZonedDateTime getVersionControlActionDate(VersionControlEvent event, VersionControlActionType type) {
+        Optional<ZonedDateTime> timeOptional = event.Actions.stream()
+                .filter(action -> action.ActionType == type)
+                .map(action -> action.ExecutedAt)
+                .sorted(Comparator.reverseOrder())
+                .findFirst();
+
+        return timeOptional.orElseThrow(() -> new IllegalArgumentException("No datetime for type: '" + type + "' was found!"));
     }
 }

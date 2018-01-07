@@ -51,7 +51,7 @@ public class QueueProcessorTest {
     @Before
     public void setUp() {
         queue = new ListeningEventQueue(fileName);
-        processor = new QueueProcessor(queue);
+        processor = new QueueProcessor(queue, 15);
         notified = false;
     }
 

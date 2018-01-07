@@ -21,7 +21,7 @@ import ch.nicosb.eventstreamanalyzer.utils.EventUtils;
 
 import java.util.*;
 
-public class LastBuildAggregator extends Aggregator{
+public class LastBuildAggregator implements Aggregator{
     static final String TITLE = "SecsSinceLastBuild";
 
     private Set<String> titles;

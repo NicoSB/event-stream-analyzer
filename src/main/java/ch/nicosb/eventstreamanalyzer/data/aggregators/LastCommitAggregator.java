@@ -20,7 +20,7 @@ import ch.nicosb.eventstreamanalyzer.utils.EventUtils;
 
 import java.util.*;
 
-public class LastCommitAggregator extends Aggregator {
+public class LastCommitAggregator implements Aggregator {
     static final String TITLE = "SecsSinceLastCommit";
 
     private Set<String> titles;

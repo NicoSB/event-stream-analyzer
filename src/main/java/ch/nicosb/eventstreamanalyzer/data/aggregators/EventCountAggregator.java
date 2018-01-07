@@ -19,7 +19,7 @@ import cc.kave.commons.model.events.IIDEEvent;
 
 import java.util.*;
 
-public class EventCountAggregator extends Aggregator {
+public class EventCountAggregator implements Aggregator {
     private HashMap<String, IntervalEventWindow> eventWindows;
     private Set<String> titles;
 

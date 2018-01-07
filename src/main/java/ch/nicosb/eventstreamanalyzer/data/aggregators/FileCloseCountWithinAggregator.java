@@ -22,7 +22,7 @@ import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class FileCloseCountWithinAggregator extends Aggregator {
+public class FileCloseCountWithinAggregator implements Aggregator {
 
     final static String TITLE_BLUEPRINT = "FilesClosedInLast%ds";
     private Set<Integer> windows;

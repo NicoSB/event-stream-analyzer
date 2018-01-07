@@ -15,7 +15,7 @@
  */
 package ch.nicosb.eventstreamanalyzer.data.aggregators;
 
-public abstract class NominalAggregator extends Aggregator {
+public abstract class NominalAggregator implements Aggregator {
     String[] possibleValues;
 
     public NominalAggregator(String... possibleValues) {
