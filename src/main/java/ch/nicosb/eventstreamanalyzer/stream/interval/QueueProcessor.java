@@ -15,14 +15,17 @@
  */
 package ch.nicosb.eventstreamanalyzer.stream.interval;
 
+import cc.kave.commons.model.events.CommandEvent;
 import cc.kave.commons.model.events.IIDEEvent;
 import ch.nicosb.eventstreamanalyzer.data.aggregators.Aggregator;
 import ch.nicosb.eventstreamanalyzer.data.sampling.IntervalPicker;
 import ch.nicosb.eventstreamanalyzer.data.sampling.SamplePicker;
 import ch.nicosb.eventstreamanalyzer.parser.ListeningEventQueue;
 import ch.nicosb.eventstreamanalyzer.stream.util.StatusProvider;
+import ch.nicosb.eventstreamanalyzer.utils.EventUtils;
 
 import java.io.IOException;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 public class QueueProcessor implements Runnable, StatusProvider {
@@ -33,9 +36,13 @@ public class QueueProcessor implements Runnable, StatusProvider {
     private boolean cancelled;
     private int eventsWritten = 0;
     private int eventsSkipped = 0;
+    private int interval;
+    private ZonedDateTime lastEventEnd;
 
     public QueueProcessor(ListeningEventQueue queue, int interval) {
         cancelled = false;
+        this.interval = interval;
+
         String fileName = queue.getTitle();
         this.queue = queue;
         arffWriter = new ArffWriter(aggregators, fileName);
@@ -62,6 +69,7 @@ public class QueueProcessor implements Runnable, StatusProvider {
             processNextEvent();
         }
 
+        evaluateEnd();
         try {
             arffWriter.close();
         } catch (IOException e) {
@@ -79,14 +87,40 @@ public class QueueProcessor implements Runnable, StatusProvider {
 
     private void tryExtractAndWriteValues(IIDEEvent event) {
         try {
-            Map<String, String> combinedMap = extractValues(event);
-            if (shouldSample(event)) {
-                tryMapWrite(combinedMap);
-            } else {
-                eventsSkipped++;
+            if (!isWithinIntervalOfLastEvent(event)) {
+                IIDEEvent dummyEvent = createDummyEvent();
+                extractAndWriteValues(dummyEvent);
             }
+
+            extractAndWriteValues(event);
+            lastEventEnd = EventUtils.getEnd(event);
         } catch (Exception e) {
             System.err.println("Failed to write event: " + event.toString());
+        }
+    }
+
+    private boolean isWithinIntervalOfLastEvent(IIDEEvent event) {
+        if (lastEventEnd == null)
+            return true;
+
+        ZonedDateTime maxTime = lastEventEnd.plusSeconds(2 * interval);
+        return !event.getTriggeredAt().isAfter(maxTime);
+    }
+
+    private IIDEEvent createDummyEvent() {
+        CommandEvent event = new CommandEvent();
+        event.CommandId = "DummyEvent";
+        event.TriggeredAt = lastEventEnd.plusSeconds(interval + 1);
+
+        return event;
+    }
+
+    private void extractAndWriteValues(IIDEEvent event) {
+        Map<String, String> combinedMap = extractValues(event);
+        if (shouldSample(event)) {
+            tryMapWrite(combinedMap);
+        } else {
+            eventsSkipped++;
         }
     }
 
@@ -107,6 +141,12 @@ public class QueueProcessor implements Runnable, StatusProvider {
 
     private boolean isRunning() {
         return !cancelled || queue.size() > 0;
+    }
+
+
+    private void evaluateEnd() {
+        IIDEEvent endEvent = createDummyEvent();
+        tryExtractAndWriteValues(endEvent);
     }
 
     @Override
