@@ -15,6 +15,7 @@
  */
 package ch.nicosb.eventstreamanalyzer.data.aggregators;
 
+import cc.kave.commons.model.events.CommandEvent;
 import cc.kave.commons.model.events.IIDEEvent;
 import cc.kave.commons.model.events.visualstudio.BuildEvent;
 import cc.kave.commons.model.events.visualstudio.BuildTarget;
@@ -58,7 +59,7 @@ public class LastBuildWithinAggregatorTest {
     }
 
     @Test
-    public void whenNoSuccessfulBuildPreceded_returnsFalse() {
+    public void whenNoBuildPreceded_returnsFalse() {
         // given
         IIDEEvent event = new TestEvent(ZonedDateTime.now());
 
@@ -74,9 +75,9 @@ public class LastBuildWithinAggregatorTest {
     }
 
     @Test
-    public void whenSuccessfulBuildEventIsGiven_returnsTrue() {
+    public void whenBuildEventIsGiven_returnsTrue() {
         // given
-        BuildEvent event = createSuccessfulBuildEvent();
+        BuildEvent event = createBuildEvent();
         event.TriggeredAt = ZonedDateTime.now();
 
         String title = String.format(LastBuildWithinAggregator.TITLE_BLUEPRINT, WINDOW_SIZE);
@@ -91,10 +92,10 @@ public class LastBuildWithinAggregatorTest {
     }
 
     @Test
-    public void whenSuccessfulBuildEventPrecededWithinTimeWindow_returnsTrue() {
+    public void whenBuildEventPrecededWithinTimeWindow_returnsTrue() {
         // given
         ZonedDateTime now = ZonedDateTime.now();
-        BuildEvent buildEvent = createSuccessfulBuildEvent();
+        BuildEvent buildEvent = createBuildEvent();
 
         buildEvent.TriggeredAt = now.minusSeconds(WINDOW_SIZE - 1);
         IIDEEvent event = new TestEvent(now);
@@ -112,10 +113,10 @@ public class LastBuildWithinAggregatorTest {
     }
 
     @Test
-    public void whenSuccessfulBuildEventPrecededOutsideTimeWindow_returnsFalse() {
+    public void whenBuildEventPrecededOutsideTimeWindow_returnsFalse() {
         // given
         ZonedDateTime now = ZonedDateTime.now();
-        BuildEvent buildEvent = createSuccessfulBuildEvent();
+        BuildEvent buildEvent = createBuildEvent();
 
         buildEvent.TriggeredAt = now.minusSeconds(WINDOW_SIZE + 1);
         IIDEEvent event = new TestEvent(now);
@@ -133,13 +134,31 @@ public class LastBuildWithinAggregatorTest {
     }
 
     @Test
+    public void whenBuildCommandEventIsGiven_returnsTrue() {
+        // given
+        CommandEvent commandEvent = new CommandEvent();
+        commandEvent.CommandId = "5EFC7975-14BC-11CF-9B2B-00AA00573819}:882:Build.BuildSolution";
+        commandEvent.TriggeredAt = ZonedDateTime.now();
+
+        String title = String.format(LastBuildWithinAggregator.TITLE_BLUEPRINT, WINDOW_SIZE);
+        String expected = LastBuildWithinAggregator.TRUE;
+
+        // when
+        Map<String, String> result = aggregator.aggregateValue(commandEvent);
+
+        // then
+        assertEquals(1, result.size());
+        assertEquals(expected, result.get(title));
+    }
+
+    @Test
     public void whenMultipleWindowsAreGiven_returnsCorrectValues() {
         // given
         int windowSize2 = WINDOW_SIZE * 2;
         aggregator = new LastBuildWithinAggregator(WINDOW_SIZE, windowSize2);
 
         ZonedDateTime now = ZonedDateTime.now();
-        BuildEvent buildEvent = createSuccessfulBuildEvent();
+        BuildEvent buildEvent = createBuildEvent();
 
         buildEvent.TriggeredAt = now.minusSeconds(WINDOW_SIZE + 1);
         IIDEEvent event = new TestEvent(now);
@@ -159,7 +178,7 @@ public class LastBuildWithinAggregatorTest {
         assertEquals(expected2, result.get(title2));
     }
 
-    private BuildEvent createSuccessfulBuildEvent() {
+    private BuildEvent createBuildEvent() {
         BuildEvent buildEvent = new BuildEvent();
         buildEvent.Targets = new ArrayList<>();
 

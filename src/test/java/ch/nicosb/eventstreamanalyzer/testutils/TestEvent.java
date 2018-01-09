@@ -15,25 +15,30 @@
  */
 package ch.nicosb.eventstreamanalyzer.testutils;
 
-
 import cc.kave.commons.model.events.IIDEEvent;
 
 import java.time.ZonedDateTime;
 
 public class TestEvent implements IIDEEvent {
-    private ZonedDateTime dateTime;
+    private ZonedDateTime triggeredAt;
+    private ZonedDateTime terminatedAt;
 
     public TestEvent(ZonedDateTime dateTime) {
-        this.dateTime = dateTime;
+        triggeredAt = dateTime;
+        terminatedAt = dateTime;
+    }
+    public TestEvent(ZonedDateTime triggeredAt, ZonedDateTime terminatedAt) {
+        this.triggeredAt = triggeredAt;
+        this.terminatedAt = terminatedAt;
     }
 
     @Override
     public ZonedDateTime getTriggeredAt() {
-        return dateTime;
+        return triggeredAt;
     }
 
     @Override
     public ZonedDateTime getTerminatedAt() {
-        return dateTime;
+        return terminatedAt;
     }
 }

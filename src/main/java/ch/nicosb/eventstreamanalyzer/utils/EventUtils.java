@@ -15,6 +15,7 @@
  */
 package ch.nicosb.eventstreamanalyzer.utils;
 
+import cc.kave.commons.model.events.CommandEvent;
 import cc.kave.commons.model.events.IIDEEvent;
 import cc.kave.commons.model.events.versioncontrolevents.VersionControlAction;
 import cc.kave.commons.model.events.versioncontrolevents.VersionControlActionType;
@@ -23,14 +24,22 @@ import cc.kave.commons.model.events.visualstudio.BuildEvent;
 import cc.kave.commons.model.events.visualstudio.BuildTarget;
 import cc.kave.commons.model.events.visualstudio.DocumentAction;
 import cc.kave.commons.model.events.visualstudio.DocumentEvent;
+import sun.misc.CEFormatException;
 
 import javax.print.Doc;
 import java.time.ZonedDateTime;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class EventUtils {
+
+    private static final Set<String> BUILD_EVENT_TITLES = new HashSet<>();
+
+    static {
+        BUILD_EVENT_TITLES.add("SolutionBuilderTres:1:BuildSolution");
+        BUILD_EVENT_TITLES.add("SolBuilderDuo.Build");
+        BUILD_EVENT_TITLES.add("VsAction:1:Build.BuildSolution");
+        BUILD_EVENT_TITLES.add("5EFC7975-14BC-11CF-9B2B-00AA00573819}:882:Build.BuildSolution");
+    }
 
     public static boolean isCommitEvent(IIDEEvent event) {
         if(!(event instanceof VersionControlEvent))
@@ -89,5 +98,18 @@ public class EventUtils {
                 .findFirst();
 
         return timeOptional.orElseThrow(() -> new IllegalArgumentException("No datetime for type: '" + type + "' was found!"));
+    }
+
+    public static boolean isBuildEvent(IIDEEvent event) {
+        if (!(event instanceof BuildEvent) && !(event instanceof CommandEvent))
+            return false;
+
+        if (event instanceof BuildEvent)
+            return true;
+
+        CommandEvent commandEvent = (CommandEvent) event;
+
+        return BUILD_EVENT_TITLES.contains(commandEvent.CommandId);
+
     }
 }

@@ -28,8 +28,7 @@ import java.util.*;
 
 public class Intervalling implements Execution {
 
-    private static final int INTERVAL = 15;
-    private QueueProcessor processor;
+    private static final int INTERVAL = 60;
 
     @Override
     public void execute(String[] args) {
@@ -37,7 +36,7 @@ public class Intervalling implements Execution {
             String folder = args[1];
             List<Path> zips = ZipUtils.getAllZips(folder);
 
-            zips.parallelStream().forEach(this::processZip);
+            zips.forEach(this::processZip);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -48,27 +47,28 @@ public class Intervalling implements Execution {
         String filepathHash = String.valueOf(path.toString().hashCode());
 
         ListeningEventQueue queue = new ListeningEventQueue(filepathHash);
-        processor = new QueueProcessor(queue, INTERVAL);
+        QueueProcessor processor = new QueueProcessor(queue, INTERVAL);
 
-        PeriodicLogger logger = createLogger(parser);
+        PeriodicLogger logger = createLogger(parser, processor);
 
-        registerAggregators();
+        registerAggregators(processor);
         parser.subscribe(queue);
 
         processor.start();
         parser.parse();
+
         processor.stop();
         logger.stop();
     }
 
-    private PeriodicLogger createLogger(NotifyingZipParser parser) {
+    private PeriodicLogger createLogger(NotifyingZipParser parser, QueueProcessor processor) {
         PeriodicLogger logger = new PeriodicLogger(5);
         logger.registerProvider(parser);
         logger.registerProvider(processor);
         return logger;
     }
 
-    private void registerAggregators() {
+    private void registerAggregators(QueueProcessor processor) {
         int thirtySeconds = 30;
         int fiveMinutes = 5*60;
         int twoMinutes = 2*60;
@@ -78,9 +78,6 @@ public class Intervalling implements Execution {
 
         Aggregator timeSinceLastBuildAggregator = new LastBuildAggregator(twoMinutes);
         processor.registerAggregator(timeSinceLastBuildAggregator);
-
-        Aggregator timeSinceLastCommitAggregator = new LastCommitAggregator(twoMinutes);
-        processor.registerAggregator(timeSinceLastCommitAggregator);
 
         Aggregator lastSuccessfulTestWithinAggregator = new LastSuccessfulTestWithinAggregator(thirtySeconds, twoMinutes, fiveMinutes);
         processor.registerAggregator(lastSuccessfulTestWithinAggregator);
@@ -93,6 +90,9 @@ public class Intervalling implements Execution {
 
         Aggregator fileSaveCountAggregator = new FileSaveCountWithinAggregator(thirtySeconds, twoMinutes, fiveMinutes);
         processor.registerAggregator(fileSaveCountAggregator);
+
+        Aggregator activeTimeAggregator = new ActiveTimeAggregator(fiveMinutes, 5);
+        processor.registerAggregator(activeTimeAggregator);
 
         Aggregator label = new CommitWithinAggregator(INTERVAL);
         processor.registerAggregator(label);

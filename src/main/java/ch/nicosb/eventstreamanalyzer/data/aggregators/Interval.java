@@ -13,10 +13,21 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package ch.nicosb.eventstreamanalyzer.data.sampling;
+package ch.nicosb.eventstreamanalyzer.data.aggregators;
 
-import cc.kave.commons.model.events.IIDEEvent;
+import java.time.Duration;
+import java.time.ZonedDateTime;
 
-public interface SamplePicker {
-    boolean shouldSample(IIDEEvent event);
+public class Interval {
+    public ZonedDateTime start;
+    public ZonedDateTime end;
+
+    public Interval(ZonedDateTime start, ZonedDateTime end) {
+        this.start = start;
+        this.end = end;
+    }
+
+    public long lengthInMillis() {
+        return Duration.between(start, end).toMillis();
+    }
 }

@@ -15,6 +15,7 @@
  */
 package ch.nicosb.eventstreamanalyzer.utils;
 
+import cc.kave.commons.model.events.CommandEvent;
 import cc.kave.commons.model.events.IIDEEvent;
 import cc.kave.commons.model.events.versioncontrolevents.VersionControlAction;
 import cc.kave.commons.model.events.versioncontrolevents.VersionControlActionType;
@@ -23,6 +24,7 @@ import cc.kave.commons.model.events.visualstudio.BuildEvent;
 import cc.kave.commons.model.events.visualstudio.BuildTarget;
 import cc.kave.commons.model.events.visualstudio.DocumentAction;
 import cc.kave.commons.model.events.visualstudio.DocumentEvent;
+import ch.nicosb.eventstreamanalyzer.data.aggregators.CommitWithinAggregator;
 import ch.nicosb.eventstreamanalyzer.testutils.TestEvent;
 import org.junit.Test;
 
@@ -345,5 +347,86 @@ public class EventUtilsTest {
         ZonedDateTime actual = EventUtils.getVersionControlActionDate(event, VersionControlActionType.Commit);
 
         // then throws
+    }
+
+    @Test
+    public void whenEventIsNotBuildEvent_returnsFalse() {
+        // given
+        IIDEEvent event = new TestEvent(ZonedDateTime.now());
+
+        // when
+        boolean actual = EventUtils.isBuildEvent(event);
+
+        // then
+        assertFalse(actual);
+    }
+
+    @Test
+    public void whenEventIsRegularBuildEvent_returnsTrue() {
+        // given
+        IIDEEvent event = new BuildEvent();
+
+        // when
+        boolean actual = EventUtils.isBuildEvent(event);
+
+        // then
+        assertTrue(actual);
+
+    }
+
+    @Test
+    public void whenEventIsCommandRSSolutionBuildEvent_returnsTrue() {
+        // given
+        CommandEvent event = new CommandEvent();
+        event.CommandId = "SolutionBuilderTres:1:BuildSolution";
+
+        // when
+        boolean actual = EventUtils.isBuildEvent(event);
+
+        // then
+        assertTrue(actual);
+
+    }
+
+    @Test
+    public void whenEventIsCommandRSBuildEvent_returnsTrue() {
+        // given
+        CommandEvent event = new CommandEvent();
+        event.CommandId = "SolBuilderDuo.Build";
+
+        // when
+        boolean actual = EventUtils.isBuildEvent(event);
+
+        // then
+        assertTrue(actual);
+
+    }
+
+    @Test
+    public void whenEventIsCommandVSBuildEvent_returnsTrue() {
+        // given
+        CommandEvent event = new CommandEvent();
+        event.CommandId = "VsAction:1:Build.BuildSolution";
+
+        // when
+        boolean actual = EventUtils.isBuildEvent(event);
+
+        // then
+        assertTrue(actual);
+
+    }
+
+    @Test
+    public void whenEventIsCommandVSSolutionBuildEvent_returnsTrue() {
+        // given
+        CommandEvent event = new CommandEvent();
+        event.CommandId = "5EFC7975-14BC-11CF-9B2B-00AA00573819}:882:Build.BuildSolution";
+
+        // when
+        boolean actual = EventUtils.isBuildEvent(event);
+
+        // then
+        assertTrue(actual);
+
     }
 }

@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 public class LastBuildWithinAggregator extends NominalAggregator {
     static final String TRUE = "t";
     static final String FALSE = "f";
-    static final String TITLE_BLUEPRINT = "Within%dsOfSuccessfulBuild";
+    static final String TITLE_BLUEPRINT = "Within%dsOfBuild";
 
     private Map<Integer, String> titles;
     private Set<Integer> windows;
@@ -56,7 +56,7 @@ public class LastBuildWithinAggregator extends NominalAggregator {
     private boolean isWithinXSeconds(IIDEEvent event, int seconds) {
         long eventEpoch = EventUtils.getEnd(event).toEpochSecond();
 
-        if (EventUtils.isSuccessfulBuildEvent(event)) {
+        if (EventUtils.isBuildEvent(event)) {
             lastTestEventEpoch = eventEpoch;
             return true;
         }
