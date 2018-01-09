@@ -58,6 +58,7 @@ public class NotifyingZipParser implements Publisher, StatusProvider{
                 System.out.println("Failed To Parse Event");
             }
         }
+        readingArchive.close();
     }
 
     private void onEventParsed(IDEEvent event, String name) {
