@@ -45,9 +45,6 @@ public class QueueProcessorTest {
     private boolean notified;
     private ListeningEventQueue queue;
 
-    @Mock
-    private NotifyingZipParser parser;
-
     @Before
     public void setUp() {
         queue = new ListeningEventQueue(fileName);
@@ -106,6 +103,7 @@ public class QueueProcessorTest {
 
     @After
     public void cleanUp() throws IOException {
-        Files.delete(Paths.get(fileName));
+        if (Files.exists(Paths.get(fileName)))
+            Files.delete(Paths.get(fileName));
     }
 }

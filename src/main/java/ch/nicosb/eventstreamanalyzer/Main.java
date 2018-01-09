@@ -15,9 +15,7 @@
  */
 package ch.nicosb.eventstreamanalyzer;
 
-import ch.nicosb.eventstreamanalyzer.data.DataAggregation;
 import ch.nicosb.eventstreamanalyzer.stream.interval.Intervalling;
-import ch.nicosb.eventstreamanalyzer.visualization.Visualization;
 
 public class Main {
 
@@ -27,26 +25,10 @@ public class Main {
         }
 
         switch (args[0]) {
-            case "v":
-                visualizeInput(args);
-                break;
-            case "a":
-                aggregateInput(args);
-                break;
             case "i":
                 intervalizeInput(args);
                 break;
         }
-    }
-
-    private static void aggregateInput(String[] args) {
-        Execution aggregation = new DataAggregation();
-        aggregation.execute(args);
-    }
-
-    private static void visualizeInput(String[] args) {
-        Execution visualization = new Visualization();
-        visualization.execute(args);
     }
 
     private static void intervalizeInput(String[] args) {
