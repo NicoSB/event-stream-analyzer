@@ -48,11 +48,15 @@ public class NotifyingZipParser implements Publisher, StatusProvider{
         System.out.printf("Extracting events from %s.", file.toString());
 
         readingArchive = new ReadingArchive(file.toFile());
-        int total = readingArchive.getNumberOfEntries();
+
         while (readingArchive.hasNext()) {
-            IDEEvent event = readingArchive.getNext(IIDEEvent.class);
-            onEventParsed(event, file.toString());
-            counter++;
+            try {
+                IDEEvent event = readingArchive.getNext(IIDEEvent.class);
+                onEventParsed(event, file.toString());
+                counter++;
+            } catch(Exception e) {
+                System.out.println("Failed To Parse Event");
+            }
         }
     }
 

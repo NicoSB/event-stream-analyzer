@@ -44,9 +44,12 @@ public class Intervalling implements Execution {
 
     private void processZip(Path path) {
         NotifyingZipParser parser = new NotifyingZipParser(path);
-        String filepathHash = String.valueOf(path.toString().hashCode());
 
-        ListeningEventQueue queue = new ListeningEventQueue(filepathHash);
+        String filename = path.getFileName().toString();
+        String parentFolder = path.getParent().getFileName().toString();
+        String name = INTERVAL + parentFolder + "_" + filename;
+
+        ListeningEventQueue queue = new ListeningEventQueue(name);
         QueueProcessor processor = new QueueProcessor(queue, INTERVAL);
 
         PeriodicLogger logger = createLogger(parser, processor);

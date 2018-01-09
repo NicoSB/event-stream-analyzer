@@ -55,7 +55,7 @@ public class QueueProcessorTest {
     public void setUp() throws IOException {
         fileName = TestFileUtils.getRandomFilePath(ARFF).toString();
         queue = new ListeningEventQueue(fileName);
-        processor = new QueueProcessor(queue, INTERVAL);
+        processor = new  QueueProcessor(queue, INTERVAL);
         notified = false;
     }
 
