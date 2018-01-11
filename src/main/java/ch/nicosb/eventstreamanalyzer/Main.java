@@ -16,6 +16,8 @@
 package ch.nicosb.eventstreamanalyzer;
 
 import ch.nicosb.eventstreamanalyzer.stream.interval.Intervalling;
+import ch.nicosb.eventstreamanalyzer.weka.Classification;
+import ch.nicosb.eventstreamanalyzer.weka.LogisticRegression;
 
 public class Main {
 
@@ -28,12 +30,19 @@ public class Main {
             case "i":
                 intervalizeInput(args);
                 break;
+            case "c":
+                classificateInput(args);
         }
     }
 
     private static void intervalizeInput(String[] args) {
         Execution intervalling = new Intervalling();
         intervalling.execute(args);
+    }
+
+    private static void classificateInput(String[] args) {
+        Execution classification = new Classification(new LogisticRegression());
+        classification.execute(args);
     }
 
     private static void printErrorMessage() {

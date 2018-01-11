@@ -65,7 +65,7 @@ public class LastSuccessfulTestWithinAggregator extends NominalAggregator {
 
         TestRunEvent testEvent = (TestRunEvent) event;
         for (TestCaseResult result : testEvent.Tests) {
-            if (result.Result != TestResult.Success)
+            if (result.Result == TestResult.Failed)
                 return false;
         }
 

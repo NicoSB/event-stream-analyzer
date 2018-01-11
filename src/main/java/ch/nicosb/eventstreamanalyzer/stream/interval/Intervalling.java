@@ -24,16 +24,19 @@ import ch.nicosb.eventstreamanalyzer.utils.PeriodicLogger;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class Intervalling implements Execution {
 
-    private static final int INTERVAL = 60;
+    private static final int INTERVAL = 90;
+    private String outputFolder;
 
     @Override
     public void execute(String[] args) {
         try {
             String folder = args[1];
+            outputFolder = args[2];
             List<Path> zips = ZipUtils.getAllZips(folder);
 
             zips.forEach(this::processZip);
@@ -47,9 +50,11 @@ public class Intervalling implements Execution {
 
         String filename = path.getFileName().toString();
         String parentFolder = path.getParent().getFileName().toString();
-        String name = INTERVAL + parentFolder + "_" + filename;
+        String name = INTERVAL + "_" + parentFolder + "_" + filename;
 
-        ListeningEventQueue queue = new ListeningEventQueue(name);
+        String fileUri = Paths.get(outputFolder, name).toAbsolutePath().toString();
+
+        ListeningEventQueue queue = new ListeningEventQueue(fileUri);
         QueueProcessor processor = new QueueProcessor(queue, INTERVAL);
 
         PeriodicLogger logger = createLogger(parser, processor);

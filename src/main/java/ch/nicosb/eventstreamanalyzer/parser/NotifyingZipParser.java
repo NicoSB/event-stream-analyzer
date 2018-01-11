@@ -31,6 +31,7 @@ public class NotifyingZipParser implements Publisher, StatusProvider{
     private Path filePath;
     private IReadingArchive readingArchive;
     private int counter = 1;
+    private int totalEntries;
 
     public NotifyingZipParser(Path filePath) {
         if (!filePath.toString().toLowerCase().endsWith(".zip"))
@@ -48,14 +49,16 @@ public class NotifyingZipParser implements Publisher, StatusProvider{
         System.out.printf("Extracting events from %s.", file.toString());
 
         readingArchive = new ReadingArchive(file.toFile());
+        totalEntries = readingArchive.getNumberOfEntries();
 
         while (readingArchive.hasNext()) {
+            IDEEvent event = null;
             try {
-                IDEEvent event = readingArchive.getNext(IIDEEvent.class);
+                event = readingArchive.getNext(IIDEEvent.class);
                 onEventParsed(event, file.toString());
                 counter++;
             } catch(Exception e) {
-                System.out.println("Failed To Parse Event");
+                System.out.println("Failed To Parse Event: " + event);
             }
         }
         readingArchive.close();
@@ -77,6 +80,6 @@ public class NotifyingZipParser implements Publisher, StatusProvider{
 
     @Override
     public String getStatus() {
-        return String.format("%d\\%d Events parsed.", counter, readingArchive.getNumberOfEntries());
+        return String.format("%d\\%d Events parsed.", counter, totalEntries);
     }
 }
