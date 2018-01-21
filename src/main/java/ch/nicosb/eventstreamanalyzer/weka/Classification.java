@@ -47,12 +47,16 @@ public class Classification implements Execution {
         String directory = args[1];
         this.outputFile = args[2];
         try {
-            List<Path> arffFiles = FileSystemUtils.getAllFilePathsWithEnding(directory, SUFFIX_ARFF);
-            arffFiles.forEach(this::applyClassifier);
-            writeCsv();
+            evaluateArffFilesInDirectory(directory);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void evaluateArffFilesInDirectory(String directory) throws IOException {
+        List<Path> arffFiles = FileSystemUtils.getAllFilePathsWithEnding(directory, SUFFIX_ARFF);
+        arffFiles.forEach(this::applyClassifier);
+        writeCsv();
     }
 
     private void writeCsv() throws IOException {
@@ -79,6 +83,8 @@ public class Classification implements Execution {
             Evaluation evaluation = evaluate(data);
 
             addResult(path, evaluation);
+        } catch (IllegalArgumentException e) {
+            System.out.printf("%s does not contain enough instances.\n", path.toString());
         } catch (Exception e) {
             e.printStackTrace();
         }

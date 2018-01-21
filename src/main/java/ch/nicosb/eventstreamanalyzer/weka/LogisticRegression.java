@@ -22,6 +22,8 @@ public class LogisticRegression implements ClassifierFactory {
     @Override
     public Classifier createClassifier() {
         Logistic logistic = new Logistic();
+        logistic.setMaxIts(-1);
+        logistic.setRidge(0.00000001);
         return logistic;
     }
 }

@@ -29,7 +29,7 @@ import java.util.*;
 
 public class Intervalling implements Execution {
 
-    private static final int INTERVAL = 90;
+    private static final int INTERVAL = 300;
     private String outputFolder;
 
     @Override
@@ -79,6 +79,7 @@ public class Intervalling implements Execution {
     private void registerAggregators(QueueProcessor processor) {
         int thirtySeconds = 30;
         int fiveMinutes = 5*60;
+        int tenMinutes = 10*60;
         int twoMinutes = 2*60;
 
         Aggregator eventCountAggregator = new EventCountAggregator(fiveMinutes);
@@ -86,7 +87,7 @@ public class Intervalling implements Execution {
 
         Aggregator timeSinceLastBuildAggregator = new LastBuildAggregator(twoMinutes);
         processor.registerAggregator(timeSinceLastBuildAggregator);
-
+        
         Aggregator lastSuccessfulTestWithinAggregator = new LastSuccessfulTestWithinAggregator(thirtySeconds, twoMinutes, fiveMinutes);
         processor.registerAggregator(lastSuccessfulTestWithinAggregator);
 

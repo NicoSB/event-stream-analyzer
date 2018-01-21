@@ -33,8 +33,20 @@ public class ClassificationResult {
     }
 
     public static ClassificationResult fromEvaluation(String fileUri, Evaluation evaluation) {
-        return new ClassificationResult(fileUri, evaluation.precision(0), evaluation.recall(0),
-                evaluation.precision(1), evaluation.recall(1));
+        double precisionT = evaluation.precision(0);
+        double recallT = evaluation.recall(0);
+        double precisionF = evaluation.precision(1);
+        double recallF = evaluation.recall(1);
+
+        precisionT = Double.isNaN(precisionT) ? 0.0 : precisionT;
+        recallT = Double.isNaN(recallT) ? 0.0 : recallT;
+        precisionF = Double.isNaN(precisionF) ? 0.0 : precisionF;
+        recallF = Double.isNaN(recallF) ? 0.0 : recallF;
+
+        if (recallF == 1.0 && precisionF == 1.0)
+            System.out.printf("%s does not contain any positive cases!\n", fileUri);
+
+        return new ClassificationResult(fileUri, precisionT, recallT, precisionF, recallF);
     }
 
     public String toCsvString() {
