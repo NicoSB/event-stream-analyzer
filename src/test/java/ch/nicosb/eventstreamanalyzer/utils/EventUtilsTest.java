@@ -17,6 +17,9 @@ package ch.nicosb.eventstreamanalyzer.utils;
 
 import cc.kave.commons.model.events.CommandEvent;
 import cc.kave.commons.model.events.IIDEEvent;
+import cc.kave.commons.model.events.testrunevents.TestCaseResult;
+import cc.kave.commons.model.events.testrunevents.TestResult;
+import cc.kave.commons.model.events.testrunevents.TestRunEvent;
 import cc.kave.commons.model.events.versioncontrolevents.VersionControlAction;
 import cc.kave.commons.model.events.versioncontrolevents.VersionControlActionType;
 import cc.kave.commons.model.events.versioncontrolevents.VersionControlEvent;
@@ -30,6 +33,7 @@ import org.junit.Test;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -428,5 +432,51 @@ public class EventUtilsTest {
         // then
         assertTrue(actual);
 
+    }
+
+    @Test
+    public void whenIsNotTestEvent_returnsFalse() {
+        // given
+        IIDEEvent event = new TestEvent(ZonedDateTime.now());
+
+        // when
+        boolean actual = EventUtils.isSuccessfulTestEvent(event);
+
+        // then
+        assertFalse(actual);
+    }
+
+    @Test
+    public void whenIsFailingTestEvent_returnsFalse() {
+        // given
+        TestRunEvent event = new TestRunEvent();
+        event.Tests = new HashSet<>();
+        TestCaseResult result = new TestCaseResult();
+        result.Result = TestResult.Failed;
+
+        event.Tests.add(result);
+
+        // when
+        boolean actual = EventUtils.isSuccessfulTestEvent(event);
+
+        // then
+        assertFalse(actual);
+    }
+
+    @Test
+    public void whenIsSuccessfullgTestEvent_returnsFalse() {
+        // given
+        TestRunEvent event = new TestRunEvent();
+        event.Tests = new HashSet<>();
+        TestCaseResult result = new TestCaseResult();
+        result.Result = TestResult.Success;
+
+        event.Tests.add(result);
+
+        // when
+        boolean actual = EventUtils.isSuccessfulTestEvent(event);
+
+        // then
+        assertTrue(actual);
     }
 }

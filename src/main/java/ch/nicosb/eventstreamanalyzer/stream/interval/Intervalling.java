@@ -82,26 +82,35 @@ public class Intervalling implements Execution {
         int tenMinutes = 10*60;
         int twoMinutes = 2*60;
 
-        Aggregator eventCountAggregator = new EventCountAggregator(fiveMinutes);
+        Aggregator eventCountAggregator = new EventCountAggregator(INTERVAL);
         processor.registerAggregator(eventCountAggregator);
 
-        Aggregator timeSinceLastBuildAggregator = new LastBuildAggregator(twoMinutes);
+        Aggregator timeSinceLastBuildAggregator = new LastBuildAggregator(INTERVAL);
         processor.registerAggregator(timeSinceLastBuildAggregator);
         
-        Aggregator lastSuccessfulTestWithinAggregator = new LastSuccessfulTestWithinAggregator(thirtySeconds, twoMinutes, fiveMinutes);
+        Aggregator lastSuccessfulTestWithinAggregator = new LastSuccessfulTestWithinAggregator(INTERVAL);
         processor.registerAggregator(lastSuccessfulTestWithinAggregator);
 
-        Aggregator lastSuccessfulBuildWithinAggregator = new LastBuildWithinAggregator(thirtySeconds, twoMinutes, fiveMinutes);
+        Aggregator lastSuccessfulBuildWithinAggregator = new LastBuildWithinAggregator(INTERVAL);
         processor.registerAggregator(lastSuccessfulBuildWithinAggregator);
 
-        Aggregator fileCloseCountAggregator = new FileCloseCountWithinAggregator(thirtySeconds, twoMinutes, fiveMinutes);
+        Aggregator fileCloseCountAggregator = new FileCloseCountWithinAggregator(INTERVAL);
         processor.registerAggregator(fileCloseCountAggregator);
 
-        Aggregator fileSaveCountAggregator = new FileSaveCountWithinAggregator(thirtySeconds, twoMinutes, fiveMinutes);
+        Aggregator fileSaveCountAggregator = new FileSaveCountWithinAggregator(INTERVAL);
         processor.registerAggregator(fileSaveCountAggregator);
 
-        Aggregator activeTimeAggregator = new ActiveTimeAggregator(fiveMinutes, 5);
+        Aggregator activeTimeAggregator = new ActiveTimeAggregator(INTERVAL, 5);
         processor.registerAggregator(activeTimeAggregator);
+
+        Aggregator testCountAggregator = new TestCountAggregator();
+        processor.registerAggregator(testCountAggregator);
+
+        Aggregator lastTestWasSuccessfulAggregator = new LastTestWasSuccessfulAggregator();
+        processor.registerAggregator(lastTestWasSuccessfulAggregator);
+
+        Aggregator lastBuildWasSuccessful = new LastBuildWasSuccessfulAggregator();
+        processor.registerAggregator(lastBuildWasSuccessful);
 
         Aggregator label = new CommitWithinAggregator(INTERVAL);
         processor.registerAggregator(label);

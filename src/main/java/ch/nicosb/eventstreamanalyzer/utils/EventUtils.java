@@ -17,6 +17,9 @@ package ch.nicosb.eventstreamanalyzer.utils;
 
 import cc.kave.commons.model.events.CommandEvent;
 import cc.kave.commons.model.events.IIDEEvent;
+import cc.kave.commons.model.events.testrunevents.TestCaseResult;
+import cc.kave.commons.model.events.testrunevents.TestResult;
+import cc.kave.commons.model.events.testrunevents.TestRunEvent;
 import cc.kave.commons.model.events.versioncontrolevents.VersionControlAction;
 import cc.kave.commons.model.events.versioncontrolevents.VersionControlActionType;
 import cc.kave.commons.model.events.versioncontrolevents.VersionControlEvent;
@@ -111,5 +114,18 @@ public class EventUtils {
 
         return BUILD_EVENT_TITLES.contains(commandEvent.CommandId);
 
+    }
+
+    public static boolean isSuccessfulTestEvent(IIDEEvent event) {
+        if (!(event instanceof TestRunEvent))
+            return false;
+
+        TestRunEvent testEvent = (TestRunEvent) event;
+        for (TestCaseResult result : testEvent.Tests) {
+            if (result.Result == TestResult.Failed)
+                return false;
+        }
+
+        return true;
     }
 }

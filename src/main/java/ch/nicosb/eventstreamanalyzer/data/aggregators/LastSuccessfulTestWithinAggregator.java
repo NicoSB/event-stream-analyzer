@@ -60,16 +60,7 @@ public class LastSuccessfulTestWithinAggregator extends NominalAggregator {
     }
 
     private boolean isSuccessfulTest(IIDEEvent event) {
-        if (!(event instanceof TestRunEvent))
-            return false;
-
-        TestRunEvent testEvent = (TestRunEvent) event;
-        for (TestCaseResult result : testEvent.Tests) {
-            if (result.Result == TestResult.Failed)
-                return false;
-        }
-
-        return true;
+        return EventUtils.isSuccessfulTestEvent(event);
     }
 
     @Override

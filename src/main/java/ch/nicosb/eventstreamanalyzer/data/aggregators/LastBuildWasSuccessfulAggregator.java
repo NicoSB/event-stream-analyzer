@@ -16,32 +16,38 @@
 package ch.nicosb.eventstreamanalyzer.data.aggregators;
 
 import cc.kave.commons.model.events.IIDEEvent;
-import cc.kave.commons.model.events.testrunevents.TestRunEvent;
+import cc.kave.commons.model.events.visualstudio.BuildEvent;
+import ch.nicosb.eventstreamanalyzer.utils.EventUtils;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class TestCountAggregator implements Aggregator {
+public class LastBuildWasSuccessfulAggregator extends NominalAggregator {
 
+    protected static final String TRUE = "t";
+    protected static final String FALSE = "f";
+    protected static final String TITLE = "lastBuildWasSuccessful";
     private Set<String> titles = new HashSet<>();
-    private int testEventsCount = 0;
-    final static String title = "registeredTestEvents";
 
-    public TestCountAggregator() {
-        titles.add(title);
+    private boolean lastBuildWasSuccessful = false;
+
+    public LastBuildWasSuccessfulAggregator() {
+        possibleValues = new String[]{TRUE, FALSE};
+        titles.add(TITLE);
     }
-
 
     @Override
     public Map<String, String> aggregateValue(IIDEEvent event) {
         Map<String, String> map = new HashMap<>();
-        if (event instanceof TestRunEvent)
-            ++testEventsCount;
 
-        map.put(title, String.valueOf(testEventsCount));
+        if (EventUtils.isSuccessfulBuildEvent(event))
+            lastBuildWasSuccessful = true;
+        else if (event instanceof BuildEvent && !EventUtils.isSuccessfulBuildEvent(event))
+            lastBuildWasSuccessful = false;
 
+        map.put(TITLE, lastBuildWasSuccessful ? TRUE : FALSE);
         return map;
     }
 
