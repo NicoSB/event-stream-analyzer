@@ -54,13 +54,15 @@ public class LastCommitAggregator implements Aggregator {
     @Override
     public Map<String, String> aggregateValue(IIDEEvent event) {
         Map<String, String> map = new HashMap<>();
+
         if (EventUtils.isCommitEvent(event) || lastEventEnd == -1) {
+            map.put(TITLE, String.valueOf(activeTimeSinceLastCommit));
             setActiveTimeToZero(event);
         } else {
             calculateActiveTime(event);
-        }
 
-        map.put(TITLE, String.valueOf(activeTimeSinceLastCommit));
+            map.put(TITLE, String.valueOf(activeTimeSinceLastCommit));
+        }
 
         return map;
     }

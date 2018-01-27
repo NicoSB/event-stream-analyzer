@@ -17,29 +17,33 @@ package ch.nicosb.eventstreamanalyzer.weka;
 
 import ch.nicosb.eventstreamanalyzer.Execution;
 import ch.nicosb.eventstreamanalyzer.utils.FileSystemUtils;
+import ch.nicosb.eventstreamanalyzer.weka.Filter.FilterFactory;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
+import weka.classifiers.meta.ThresholdSelector;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils;
+import weka.filters.Filter;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class Classification implements Execution {
 
     static final String SUFFIX_ARFF = ".arff";
+    public static final double THRESHOLD = 0.5;
     private Classifier classifier;
+    private Filter filter;
     private List<ClassificationResult> results = new ArrayList<>();
     private String outputFile;
 
-    public Classification(ClassifierFactory classifierFactory) {
+    public Classification(ClassifierFactory classifierFactory, FilterFactory filterFactory) {
         classifier = classifierFactory.createClassifier();
+        filter = filterFactory.createFilter();
     }
 
     @Override
@@ -61,7 +65,9 @@ public class Classification implements Execution {
 
     private void writeCsv() throws IOException {
         BufferedWriter writer = Files.newBufferedWriter(Paths.get(outputFile));
-        results.forEach(result -> writeLine(writer, result));
+        results.stream()
+            .filter(ClassificationResult::containsPositiveCases)
+            .forEach(result -> writeLine(writer, result));
         writer.close();
         System.out.println(outputFile + " was written.");
     }
@@ -78,9 +84,11 @@ public class Classification implements Execution {
     private void applyClassifier(Path path) {
         try {
             Instances data = getData(path);
-            classifier.buildClassifier(data);
+            Instances filtered = filterData(data);
+            classifier.buildClassifier(filtered);
+            System.out.println(classifier.toString());
 
-            Evaluation evaluation = evaluate(data);
+            Evaluation evaluation = evaluate(filtered);
 
             addResult(path, evaluation);
         } catch (IllegalArgumentException e) {
@@ -102,9 +110,30 @@ public class Classification implements Execution {
         return data;
     }
 
+    private Instances filterData(Instances data) {
+        try {
+            filter.setInputFormat(data);
+            Instances filteredData = Filter.useFilter(data, filter);
+            filteredData.setClassIndex(1);
+            return filteredData;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     private Evaluation evaluate(Instances data) throws Exception {
+        ThresholdSelector thresholdSelector = buildThresholdSelector(THRESHOLD);
+
         Evaluation evaluation = new Evaluation(data);
-        evaluation.crossValidateModel(classifier, data, 10, new Random(1));
+        evaluation.crossValidateModel(thresholdSelector, data, 10, new Random(1));
         return evaluation;
+    }
+
+    private ThresholdSelector buildThresholdSelector(double threshold) throws Exception {
+        ThresholdSelector thresholdSelector = new ThresholdSelector();
+        thresholdSelector.setManualThresholdValue(threshold);
+        thresholdSelector.setClassifier(classifier);
+        return thresholdSelector;
     }
 }

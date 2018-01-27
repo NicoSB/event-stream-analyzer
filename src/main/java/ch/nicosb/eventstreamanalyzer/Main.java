@@ -17,6 +17,9 @@ package ch.nicosb.eventstreamanalyzer;
 
 import ch.nicosb.eventstreamanalyzer.stream.interval.Intervalling;
 import ch.nicosb.eventstreamanalyzer.weka.Classification;
+import ch.nicosb.eventstreamanalyzer.weka.Filter.ClassBalancerFactory;
+import ch.nicosb.eventstreamanalyzer.weka.Filter.EmptyFilterFactory;
+import ch.nicosb.eventstreamanalyzer.weka.Filter.ResampleFactory;
 import ch.nicosb.eventstreamanalyzer.weka.LogisticRegression;
 
 public class Main {
@@ -41,7 +44,7 @@ public class Main {
     }
 
     private static void classificateInput(String[] args) {
-        Execution classification = new Classification(new LogisticRegression());
+        Execution classification = new Classification(new LogisticRegression(), new EmptyFilterFactory());
         classification.execute(args);
     }
 

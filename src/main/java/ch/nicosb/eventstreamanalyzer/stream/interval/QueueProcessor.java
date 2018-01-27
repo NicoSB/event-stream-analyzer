@@ -139,7 +139,7 @@ public class QueueProcessor implements Runnable, StatusProvider {
         eventsWritten++;
     }
 
-    private boolean isRunning() {
+    public boolean isRunning() {
         return !cancelled || queue.size() > 0;
     }
 

@@ -56,6 +56,17 @@
       <artifactId>weka-dev</artifactId>
       <version>3.9.2</version>
     </dependency>
-
+    <!-- https://mvnrepository.com/artifact/nz.ac.waikato.cms.weka/SMOTE -->
+    <dependency>
+      <groupId>nz.ac.waikato.cms.weka</groupId>
+      <artifactId>SMOTE</artifactId>
+      <version>1.0.2</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/nz.ac.waikato.cms.weka/thresholdSelector -->
+    <dependency>
+      <groupId>nz.ac.waikato.cms.weka</groupId>
+      <artifactId>thresholdSelector</artifactId>
+      <version>1.0.3</version>
+    </dependency>
   </dependencies>
 </project>
