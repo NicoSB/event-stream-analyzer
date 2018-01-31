@@ -15,11 +15,10 @@
  */
 package ch.nicosb.eventstreamanalyzer.stream.interval;
 
-import cc.kave.commons.utils.io.Directory;
 import ch.nicosb.eventstreamanalyzer.Execution;
 import ch.nicosb.eventstreamanalyzer.data.aggregators.*;
 import ch.nicosb.eventstreamanalyzer.parser.ListeningEventQueue;
-import ch.nicosb.eventstreamanalyzer.parser.NotifyingZipParser;
+import ch.nicosb.eventstreamanalyzer.parser.NotifyingEventParser;
 import ch.nicosb.eventstreamanalyzer.parser.ZipUtils;
 import ch.nicosb.eventstreamanalyzer.utils.PeriodicLogger;
 
@@ -60,7 +59,7 @@ public class Intervalling implements Execution {
     }
 
     private void processZip(Path path) {
-        NotifyingZipParser parser = new NotifyingZipParser(path);
+        NotifyingEventParser parser = new NotifyingEventParser(path);
 
         String filename = path.getFileName().toString();
         String parentFolder = path.getParent().getFileName().toString();
@@ -87,15 +86,13 @@ public class Intervalling implements Execution {
         logger.stop();
 
         try {
-            Thread.sleep(1500);
             statisticsAggregator.close();
         }catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
-    private PeriodicLogger createLogger(NotifyingZipParser parser, QueueProcessor processor) {
+    private PeriodicLogger createLogger(NotifyingEventParser parser, QueueProcessor processor) {
         PeriodicLogger logger = new PeriodicLogger(LOGGING_INTERVAL);
         logger.registerProvider(parser);
         logger.registerProvider(processor);

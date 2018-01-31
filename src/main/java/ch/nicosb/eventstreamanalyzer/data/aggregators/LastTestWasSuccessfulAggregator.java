@@ -48,7 +48,15 @@ public class LastTestWasSuccessfulAggregator extends NominalAggregator {
             lastTestWasSuccessful = false;
 
         map.put(TITLE, lastTestWasSuccessful ? TRUE : FALSE);
+
+        resetIfLabelled(event);
+
         return map;
+    }
+
+    private void resetIfLabelled(IIDEEvent event) {
+        if (EventUtils.isCommitEvent(event))
+            lastTestWasSuccessful = false;
     }
 
     @Override

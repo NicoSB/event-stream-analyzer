@@ -25,7 +25,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NotifyingZipParser implements Publisher, StatusProvider{
+public class NotifyingEventParser implements EventPublisher, StatusProvider{
 
     private List<EventParsedListener> listeners;
     private Path filePath;
@@ -33,7 +33,7 @@ public class NotifyingZipParser implements Publisher, StatusProvider{
     private int counter = 1;
     private int totalEntries;
 
-    public NotifyingZipParser(Path filePath) {
+    public NotifyingEventParser(Path filePath) {
         if (!filePath.toString().toLowerCase().endsWith(".zip"))
             throw new IllegalArgumentException("File must be a Zip!");
 

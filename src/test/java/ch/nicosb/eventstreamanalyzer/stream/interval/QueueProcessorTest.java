@@ -18,15 +18,12 @@ package ch.nicosb.eventstreamanalyzer.stream.interval;
 import cc.kave.commons.model.events.IIDEEvent;
 import ch.nicosb.eventstreamanalyzer.data.aggregators.Aggregator;
 import ch.nicosb.eventstreamanalyzer.parser.ListeningEventQueue;
-import ch.nicosb.eventstreamanalyzer.parser.NotifyingZipParser;
 import ch.nicosb.eventstreamanalyzer.testutils.TestEvent;
 import ch.nicosb.eventstreamanalyzer.testutils.TestFileUtils;
-import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.IOException;

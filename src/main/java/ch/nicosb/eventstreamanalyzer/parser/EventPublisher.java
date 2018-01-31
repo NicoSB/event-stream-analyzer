@@ -15,7 +15,7 @@
  */
 package ch.nicosb.eventstreamanalyzer.parser;
 
-public interface Publisher {
+public interface EventPublisher {
     void subscribe(EventParsedListener listener);
     void unsubscribe(EventParsedListener listener);
 }

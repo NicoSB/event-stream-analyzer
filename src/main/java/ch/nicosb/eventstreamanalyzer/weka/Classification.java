@@ -24,6 +24,7 @@ import weka.classifiers.meta.ThresholdSelector;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils;
 import weka.filters.Filter;
+import weka.filters.unsupervised.instance.RemoveWithValues;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -34,8 +35,8 @@ import java.util.*;
 
 public class Classification implements Execution {
 
-    static final String SUFFIX_ARFF = ".arff";
-    public static final double THRESHOLD = 0.5;
+    private static final String SUFFIX_ARFF = ".arff";
+    private double THRESHOLD = 0.5;
     private Classifier classifier;
     private Filter filter;
     private List<ClassificationResult> results = new ArrayList<>();
@@ -50,6 +51,8 @@ public class Classification implements Execution {
     public void execute(String[] args) {
         String directory = args[1];
         this.outputFile = args[2];
+        if(args.length >= 4)
+            THRESHOLD = Double.valueOf(args[3]);
         try {
             evaluateArffFilesInDirectory(directory);
         } catch (IOException e) {
@@ -84,7 +87,8 @@ public class Classification implements Execution {
     private void applyClassifier(Path path) {
         try {
             Instances data = getData(path);
-            Instances filtered = filterData(data);
+            Instances cleaned = cleanData(data);
+            Instances filtered = filterData(cleaned);
             classifier.buildClassifier(filtered);
             System.out.println(classifier.toString());
 
@@ -96,6 +100,24 @@ public class Classification implements Execution {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private Instances cleanData(Instances data) throws Exception {
+        Instances cleaned = removeNegativeValues(data, "6");
+        return removeNegativeValues(cleaned, "9");
+    }
+
+    private Instances removeNegativeValues(Instances data, String attributeIndex) throws Exception {
+        data.setClassIndex(8);
+        RemoveWithValues removeInvalidTimes = new RemoveWithValues();
+        removeInvalidTimes.setSplitPoint(0.0);
+        removeInvalidTimes.setAttributeIndex(attributeIndex);
+        removeInvalidTimes.setInputFormat(data);
+
+        Instances cleaned = Filter.useFilter(data, removeInvalidTimes);
+        cleaned.setClassIndex(1);
+
+        return cleaned;
     }
 
     private void addResult(Path path, Evaluation evaluation) {

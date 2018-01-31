@@ -20,7 +20,7 @@ import cc.kave.commons.model.events.IIDEEvent;
 import java.util.ArrayDeque;
 import java.util.Queue;
 
-public class ListeningEventQueue implements EventParsedListener {
+public class ListeningEventQueue implements EventParsedListener, EventQueue {
     private Queue<IIDEEvent> queue;
     private String title;
 
@@ -29,10 +29,12 @@ public class ListeningEventQueue implements EventParsedListener {
         this.title = title;
     }
 
+    @Override
     public void add(IIDEEvent event) {
         queue.add(event);
     }
 
+    @Override
     public IIDEEvent poll() {
         return queue.poll();
     }
@@ -46,6 +48,7 @@ public class ListeningEventQueue implements EventParsedListener {
         return title;
     }
 
+    @Override
     public int size() {
         return queue.size();
     }

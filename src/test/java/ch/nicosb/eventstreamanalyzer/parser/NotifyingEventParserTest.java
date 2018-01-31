@@ -26,14 +26,14 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-public class NotifyingZipParserTest {
+public class NotifyingEventParserTest {
 
-    private NotifyingZipParser parser;
+    private NotifyingEventParser parser;
     private static final String RESOURCES_URI = "src/test/resources/folder1/test1.zip";
 
     @Before
     public void setUp() {
-        parser = new NotifyingZipParser(Paths.get(RESOURCES_URI));
+        parser = new NotifyingEventParser(Paths.get(RESOURCES_URI));
     }
 
 
